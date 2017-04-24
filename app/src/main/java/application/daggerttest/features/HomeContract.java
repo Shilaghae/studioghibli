@@ -1,7 +1,9 @@
 package application.daggerttest.features;
 
+import java.util.List;
+
+import application.daggerttest.Movie;
 import application.daggerttest.base.BaseView;
-import io.reactivex.Observable;
 
 /**
  * @author anna
@@ -11,9 +13,7 @@ public class HomeContract {
 
     public interface HomeView extends BaseView {
 
-        Observable<String> onInitPreferences();
-
-        void setInitPreferences(String value);
+        void showGhibliMovies(List<Movie> movies);
     }
 
     public interface HomePresenter {

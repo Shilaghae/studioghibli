@@ -26,4 +26,8 @@ public abstract class BaseActivity<V extends BaseView> extends AppCompatActivity
     public abstract BasePresenter<V> getPresenter();
 
     public abstract void inject();
+
+    public AppComponent getAppComponent() {
+        return ((AppApplication) getApplication()).getAppComponent();
+    }
 }
