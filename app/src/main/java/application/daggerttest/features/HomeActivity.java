@@ -39,7 +39,9 @@ public class HomeActivity extends BaseActivity implements HomeContract.HomeView 
 
     @Override
     public void inject() {
-        ((AppApplication) getApplication()).getAppComponent().inject(this);
+        ((AppApplication) getApplication()).getAppComponent().getHomeComponent(new HomeModule()).inject(this);
+
+//        DaggerHomeComponent.builder().homeModule(new HomeModule()).build().inject(this);
     }
 
     @Override

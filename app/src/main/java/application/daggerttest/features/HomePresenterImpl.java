@@ -50,14 +50,6 @@ public class HomePresenterImpl extends BasePresenter<HomeContract.HomeView> impl
 //
 //                    }
 //                }));
-
-
-//        RxJava2CallAdapterFactory rxAdapter = RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io());
-//        Retrofit retrofit = new Retrofit.Builder()
-//                .baseUrl("https://api.github.com")
-//                .addConverterFactory(GsonConverterFactory.create())
-//                .addCallAdapterFactory(rxAdapter)
-//                .build();
         MyApiEndpointInterface apiService =
                 mRetrofit.create(MyApiEndpointInterface.class);
         Observable<User> shilaghae = apiService.getUser("shilaghae");
