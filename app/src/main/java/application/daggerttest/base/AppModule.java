@@ -28,4 +28,9 @@ public class AppModule {
     Context provideContext() {
         return mApplication.getApplicationContext();
     }
+
+    @Provides
+    AppPreferences provideAppPreferences(final Context context) {
+        return new AppPreferences(context);
+    }
 }
