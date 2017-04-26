@@ -1,6 +1,7 @@
 package application.daggerttest.base;
 
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 
 import butterknife.ButterKnife;
@@ -29,5 +30,9 @@ public abstract class BaseActivity<V extends BaseView> extends AppCompatActivity
 
     public AppComponent getAppComponent() {
         return ((AppApplication) getApplication()).getAppComponent();
+    }
+
+    public boolean isAirplaneModeActive() {
+        return Settings.System.getInt(getContentResolver(), Settings.System.AIRPLANE_MODE_ON, 0) == 1;
     }
 }

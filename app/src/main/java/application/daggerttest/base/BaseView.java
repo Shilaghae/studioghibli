@@ -6,4 +6,5 @@ package application.daggerttest.base;
 
 public interface BaseView {
     void init();
+    boolean isAirplaneModeActive();
 }

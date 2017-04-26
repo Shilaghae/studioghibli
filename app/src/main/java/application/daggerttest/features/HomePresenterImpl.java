@@ -2,14 +2,20 @@ package application.daggerttest.features;
 
 import android.support.annotation.NonNull;
 
-import java.util.ArrayList;
+import java.net.UnknownHostException;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
 import application.daggerttest.Movie;
+import application.daggerttest.MovieRepositoryRealm;
 import application.daggerttest.base.AppPreferences;
 import application.daggerttest.base.BasePresenter;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -18,13 +24,16 @@ import io.reactivex.schedulers.Schedulers;
 
 public class HomePresenterImpl extends BasePresenter<HomeContract.HomeView> implements HomeContract.HomePresenter {
 
+    public static final long RETRY_ON_ERROR = 10000L;
     private final GhibliService mGhibliService;
     private final AppPreferences mAppPreferences;
+    private final MovieRepositoryRealm mMovieRepositoryRealm;
 
     @Inject
-    HomePresenterImpl(final GhibliService ghibliService, final AppPreferences appPreferences) {
+    HomePresenterImpl(final GhibliService ghibliService, final AppPreferences appPreferences, final MovieRepositoryRealm movieRepositoryRealm) {
         mGhibliService = ghibliService;
         mAppPreferences = appPreferences;
+        mMovieRepositoryRealm = movieRepositoryRealm;
     }
 
     @Override
@@ -34,58 +43,27 @@ public class HomePresenterImpl extends BasePresenter<HomeContract.HomeView> impl
         subscribe(mGhibliService.getMovies()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(error -> {
+                    if (error instanceof UnknownHostException) {
+                        // take it from the database
+                        List<Movie> movies = mMovieRepositoryRealm.getAllMovies();
+                        view.showGhibliMovies(movies);
+                        view.showNoConnectionMessage();
+                        mAppPreferences.setMovieListUpToDate(false);
+                    } else {
+                        view.showErrorMessage();
+                    }
+                })
+                .retryWhen(throwableObservable -> throwableObservable.flatMap((Function<Throwable, ObservableSource<?>>) throwable -> Observable.timer(RETRY_ON_ERROR, TimeUnit.MILLISECONDS)))
                 .subscribe(movies -> {
                     view.showGhibliMovies(movies);
+                    view.hideNoConnectionMessage();
                     if (!mAppPreferences.isMovieListUpToDate()) {
                         // Change file
+                        mMovieRepositoryRealm.removeAllMovies();
+                        mMovieRepositoryRealm.addAllMovies(movies);
                         mAppPreferences.setMovieListUpToDate(true);
                     }
-                },throwable -> {
-                    // take it from the database
-                    ArrayList<Movie> movies = new ArrayList<Movie>();
-                    movies.add(new Movie("1", "Anna"));
-                    movies.add(new Movie("2", "Beta"));
-                    view.showGhibliMovies(movies);
-                    mAppPreferences.setMovieListUpToDate(false);
-                }));
-
-//        subscribe(mAppPreferences.onMovieListUpToDate()
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .flatMap(isMovieListUpToDate -> {
-//                    if (isMovieListUpToDate) {
-//                        // take it from the database
-//                        ArrayList<Movie> movies = new ArrayList<Movie>();
-//                        movies.add(new Movie("1", "Anna"));
-//                        movies.add(new Movie("2", "Beta"));
-//                        return Observable.just(movies);
-//                    } else {
-//                        Observable<List<Movie>> userObservable = mGhibliService.getMovies();
-//                        return userObservable;
-//                    }
-//                })
-//                .subscribe(movies -> {
-//                            view.showGhibliMovies(movies);
-//                            if (!mAppPreferences.isMovieListUpToDate()) {
-//                                // Change file
-//                                mAppPreferences.setMovieListUpToDate(true);
-//                            }
-//                        },
-//                        throwable -> {
-//                            // take it from the database
-//                            ArrayList<Movie> movies = new ArrayList<Movie>();
-//                            movies.add(new Movie("1", "Anna"));
-//                            movies.add(new Movie("2", "Beta"));
-//                            view.showGhibliMovies(movies);
-//                        }));
-//
-//        Observable<List<Movie>> userObservable = mGhibliService.getMovies();
-//        subscribe(userObservable
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(movies -> {
-//                    view.showGhibliMovies(movies);
-//                }));
-
+                }, Throwable::printStackTrace));
     }
 }

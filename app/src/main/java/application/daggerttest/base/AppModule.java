@@ -3,6 +3,7 @@ package application.daggerttest.base;
 import android.app.Application;
 import android.content.Context;
 
+import application.daggerttest.MovieRepositoryRealm;
 import dagger.Module;
 import dagger.Provides;
 
@@ -32,5 +33,10 @@ public class AppModule {
     @Provides
     AppPreferences provideAppPreferences(final Context context) {
         return new AppPreferences(context);
+    }
+
+    @Provides
+    MovieRepositoryRealm provideMovieRepositoryRealm(final Context context) {
+        return new MovieRepositoryRealm(context);
     }
 }

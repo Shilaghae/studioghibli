@@ -21,7 +21,7 @@ public class AppPreferences {
     }
 
     public boolean isMovieListUpToDate() {
-        return mMovieListUpdateSharedPreferences.getBoolean(IS_MOVIE_LIST_UPDATE, true);
+        return mMovieListUpdateSharedPreferences.getBoolean(IS_MOVIE_LIST_UPDATE, false);
     }
 
     public void setMovieListUpToDate(final boolean upToDate) {
