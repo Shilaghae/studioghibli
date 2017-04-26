@@ -1,17 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="application.daggerttest.features.home.HomeActivity">
-    <TextView
-        android:id="@+id/movie_details_activity_title"
+    android:layout_height="match_parent">
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"/>
+        android:orientation="vertical"
+        tools:context="application.ghiblimovie.features.home.HomeActivity">
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/movie_details_activity_textview_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:textColor="#1e2b59"
+            android:textSize="22sp"
+            android:textStyle="bold"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingEnd="@dimen/movie_details_padding_end"
+            android:paddingStart="@dimen/movie_details_padding_start">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/movie_details_activity_director"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/movie_details_activity_textview_director"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="0dp"
+                android:paddingStart="@dimen/movie_details_padding_start"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingEnd="@dimen/movie_details_padding_end"
+            android:paddingStart="@dimen/movie_details_padding_start">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/movie_details_activity_producer"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/movie_details_activity_textview_producer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="0dp"
+                android:paddingStart="@dimen/movie_details_padding_start"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingEnd="@dimen/movie_details_padding_end"
+            android:paddingStart="@dimen/movie_details_padding_start">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/movie_details_activity_release_date"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/movie_details_activity_textview_relese_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="0dp"
+                android:paddingStart="@dimen/movie_details_padding_start"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingEnd="@dimen/movie_details_padding_end"
+            android:paddingStart="@dimen/movie_details_padding_start">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/movie_details_activity_score"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/movie_details_activity_textview_score"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="0dp"
+                android:paddingStart="@dimen/movie_details_padding_start"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/movie_details_activity_textview_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="20dp"
+            android:paddingEnd="@dimen/movie_details_padding_end"
+            android:paddingStart="@dimen/movie_details_padding_start"
+            android:textSize="16sp"/>
+    </LinearLayout>
+</ScrollView>
