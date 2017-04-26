@@ -1,5 +1,6 @@
-package application.daggerttest.features;
+package application.daggerttest.features.home;
 
+import application.daggerttest.services.GhibliService;
 import dagger.Module;
 import dagger.Provides;
 

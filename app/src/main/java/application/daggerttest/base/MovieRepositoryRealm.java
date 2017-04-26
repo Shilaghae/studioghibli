@@ -1,4 +1,4 @@
-package application.daggerttest;
+package application.daggerttest.base;
 
 import android.content.Context;
 

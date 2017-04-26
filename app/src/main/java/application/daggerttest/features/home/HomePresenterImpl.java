@@ -1,4 +1,4 @@
-package application.daggerttest.features;
+package application.daggerttest.features.home;
 
 import android.support.annotation.NonNull;
 
@@ -8,10 +8,11 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-import application.daggerttest.Movie;
-import application.daggerttest.MovieRepositoryRealm;
+import application.daggerttest.base.Movie;
+import application.daggerttest.base.MovieRepositoryRealm;
 import application.daggerttest.base.AppPreferences;
 import application.daggerttest.base.BasePresenter;
+import application.daggerttest.services.GhibliService;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -65,5 +66,13 @@ public class HomePresenterImpl extends BasePresenter<HomeContract.HomeView> impl
                         mAppPreferences.setMovieListUpToDate(true);
                     }
                 }, Throwable::printStackTrace));
+
+        subscribe(view.onMovieItemClicked()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(movie -> {
+                    view.showMovieDetails(movie);
+                })
+        );
     }
 }

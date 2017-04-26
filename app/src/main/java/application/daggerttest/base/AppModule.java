@@ -3,7 +3,6 @@ package application.daggerttest.base;
 import android.app.Application;
 import android.content.Context;
 
-import application.daggerttest.MovieRepositoryRealm;
 import dagger.Module;
 import dagger.Provides;
 

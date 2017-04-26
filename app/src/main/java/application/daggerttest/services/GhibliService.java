@@ -1,8 +1,8 @@
-package application.daggerttest.features;
+package application.daggerttest.services;
 
 import java.util.List;
 
-import application.daggerttest.Movie;
+import application.daggerttest.base.Movie;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
@@ -30,7 +30,7 @@ public class GhibliService {
                 .build();
     }
 
-    Observable<List<Movie>> getMovies() {
+    public Observable<List<Movie>> getMovies() {
         GhibliApi ghibliApiService =
                 mRetrofit.create(GhibliApi.class);
         return ghibliApiService.getMovies();

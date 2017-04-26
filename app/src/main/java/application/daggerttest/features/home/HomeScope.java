@@ -1,4 +1,4 @@
-package application.daggerttest.features;
+package application.daggerttest.features.home;
 
 import javax.inject.Scope;
 
