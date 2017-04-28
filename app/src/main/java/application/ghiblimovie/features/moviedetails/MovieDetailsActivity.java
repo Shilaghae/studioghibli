@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.TextView;
 
+import java.util.HashMap;
+
 import javax.inject.Inject;
 
 import application.ghiblimovie.base.Movie;
@@ -21,16 +23,19 @@ public class MovieDetailsActivity extends BaseActivity implements MovieDetailsCo
 
     @BindView(R.id.movie_details_activity_textview_title)
     TextView mTitleTextView;
-    @BindView(R.id.movie_details_activity_textview_director)
-    TextView mDirectorTextView;
-    @BindView(R.id.movie_details_activity_textview_producer)
-    TextView mProducerTextView;
-    @BindView(R.id.movie_details_activity_textview_relese_date)
-    TextView mReleaseDateTextView;
-    @BindView(R.id.movie_details_activity_textview_score)
-    TextView mScoreTextView;
+//    @BindView(R.id.movie_details_activity_textview_director)
+//    TextView mDirectorTextView;
+//    @BindView(R.id.movie_details_activity_textview_producer)
+//    TextView mProducerTextView;
+//    @BindView(R.id.movie_details_activity_textview_relese_date)
+//    TextView mReleaseDateTextView;
+//    @BindView(R.id.movie_details_activity_textview_score)
+//    TextView mScoreTextView;
     @BindView(R.id.movie_details_activity_textview_description)
     TextView mDescriptionTextView;
+
+    @BindView(R.id.customView)
+    MovieDetailsView mCustomView;
 
     public void init() {
     }
@@ -65,10 +70,14 @@ public class MovieDetailsActivity extends BaseActivity implements MovieDetailsCo
     @Override
     public void initMovie(final Movie movie) {
         mTitleTextView.setText(movie.getTitle());
-        mProducerTextView.setText(movie.getProducer());
-        mDirectorTextView.setText(movie.getDirector());
-        mReleaseDateTextView.setText(movie.getReleaseDate());
-        mScoreTextView.setText(movie.getScore());
+//        mProducerTextView.setText(movie.getProducer());
+//        mDirectorTextView.setText(movie.getDirector());
+//        mReleaseDateTextView.setText(movie.getReleaseDate());
+//        mScoreTextView.setText(movie.getScore());
         mDescriptionTextView.setText(movie.getDescription());
+        HashMap<String, String> map = new HashMap<>();
+        map.put("serio", "carma");
+        map.put("serioxxå", "carmaxxx");
+        mCustomView.addViews(map);
     }
 }

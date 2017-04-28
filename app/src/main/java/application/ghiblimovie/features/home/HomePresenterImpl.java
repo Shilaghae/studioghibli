@@ -48,7 +48,11 @@ public class HomePresenterImpl extends BasePresenter<HomeContract.HomeView> impl
                     if (error instanceof UnknownHostException) {
                         // take it from the database
                         List<Movie> movies = mMovieRepositoryRealm.getAllMovies();
-                        view.showGhibliMovies(movies);
+                        if (!movies.isEmpty()) {
+                            view.showGhibliMovies(movies);
+                        } else {
+                            view.showNoMovie();
+                        }
                         view.showNoConnectionMessage();
                         mAppPreferences.setMovieListUpToDate(false);
                     } else {
@@ -57,13 +61,17 @@ public class HomePresenterImpl extends BasePresenter<HomeContract.HomeView> impl
                 })
                 .retryWhen(throwableObservable -> throwableObservable.flatMap((Function<Throwable, ObservableSource<?>>) throwable -> Observable.timer(RETRY_ON_ERROR, TimeUnit.MILLISECONDS)))
                 .subscribe(movies -> {
-                    view.showGhibliMovies(movies);
                     view.hideNoConnectionMessage();
-                    if (!mAppPreferences.isMovieListUpToDate()) {
-                        // Change file
-                        mMovieRepositoryRealm.removeAllMovies();
-                        mMovieRepositoryRealm.addAllMovies(movies);
-                        mAppPreferences.setMovieListUpToDate(true);
+                    if (!movies.isEmpty()) {
+                        view.showGhibliMovies(movies);
+                        if (!mAppPreferences.isMovieListUpToDate()) {
+                            // Change file
+                            mMovieRepositoryRealm.removeAllMovies();
+                            mMovieRepositoryRealm.addAllMovies(movies);
+                            mAppPreferences.setMovieListUpToDate(true);
+                        }
+                    } else {
+                        view.showNoMovie();
                     }
                 }, Throwable::printStackTrace));
 

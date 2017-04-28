@@ -25,6 +25,8 @@ public class HomeContract {
         void hideNoConnectionMessage();
 
         void showMovieDetails(Movie movie);
+
+        void showNoMovie();
     }
 
     public interface HomePresenter {

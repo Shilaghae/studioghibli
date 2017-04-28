@@ -11,10 +11,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import application.ghiblimovie.base.Movie;
 import application.ghiblimovie.R;
 import application.ghiblimovie.base.BaseActivity;
 import application.ghiblimovie.base.BasePresenter;
+import application.ghiblimovie.base.Movie;
 import application.ghiblimovie.features.moviedetails.MovieDetailsActivity;
 import butterknife.BindView;
 import io.reactivex.Observable;
@@ -23,10 +23,12 @@ public class HomeActivity extends BaseActivity implements HomeContract.HomeView 
 
     @Inject
     HomePresenterImpl mHomePresenter;
-    @BindView(R.id.offline)
+    @BindView(R.id.activity_home_textView_offline)
     TextView mUserOfflineTextView;
-    @BindView(R.id.home_activity_movieListRecyclerView)
+    @BindView(R.id.home_activity_recyclerView_movies)
     RecyclerView mMovieListRecyclerView;
+    @BindView(R.id.home_activity_textView_no_movies)
+    TextView mNoMovieTextView;
 
     private MovieListAdapter mMovieListAdapter;
 
@@ -77,12 +79,19 @@ public class HomeActivity extends BaseActivity implements HomeContract.HomeView 
 
     @Override
     public void showGhibliMovies(final List<Movie> movies) {
+        mNoMovieTextView.setVisibility(View.GONE);
+        mMovieListRecyclerView.setVisibility(View.VISIBLE);
         mMovieListAdapter.updateAllMovies(movies);
     }
 
     @Override
     public void showMovieDetails(final Movie movie) {
         MovieDetailsActivity.startActivity(this, movie);
+    }
+
+    @Override
+    public void showNoMovie() {
+        mNoMovieTextView.setVisibility(View.VISIBLE);
     }
 
     @Override

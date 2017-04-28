@@ -6,22 +6,37 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="application.ghiblimovie.features.home.HomeActivity">
+
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/offline"
-        android:textColor="#f45c42"
-        android:visibility="gone"
+        android:id="@+id/activity_home_textView_offline"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:gravity="center"
         android:text="@string/home_activity_no_connection"
-        app:layout_constraintTop_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/home_activity_movieListRecyclerView"
+        android:textStyle="bold"
+        android:visibility="visible"
+        android:textColor="@android:color/white"
+        android:background="#f45c42"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"/>
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/home_activity_movieListRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:id="@+id/home_activity_recyclerView_movies"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/activity_home_textView_offline"/>
+
+    <TextView
+        android:id="@+id/home_activity_textView_no_movies"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:text="@string/home_activity_no_movies_to_show"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

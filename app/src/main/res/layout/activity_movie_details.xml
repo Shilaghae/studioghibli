@@ -22,101 +22,83 @@
             android:textSize="22sp"
             android:textStyle="bold"/>
 
-        <LinearLayout
+        <application.ghiblimovie.features.moviedetails.MovieDetailsView
+            android:id="@+id/activity_movie_movieDetailsView_details"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingEnd="@dimen/movie_details_padding_end"
-            android:paddingStart="@dimen/movie_details_padding_start">
+            android:layout_height="wrap_content">
+        </application.ghiblimovie.features.moviedetails.MovieDetailsView>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/movie_details_activity_director"
-                android:textSize="16sp"
-                android:textStyle="bold"/>
+        <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:paddingEnd="@dimen/movie_details_padding_end"-->
+            <!--android:paddingStart="@dimen/movie_details_padding_start">-->
 
-            <TextView
-                android:id="@+id/movie_details_activity_textview_director"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingEnd="0dp"
-                android:paddingStart="@dimen/movie_details_padding_start"
-                android:textSize="16sp"
-                android:textStyle="bold"/>
-        </LinearLayout>
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="@string/movie_details_activity_producer"-->
+                <!--android:textSize="16sp"-->
+                <!--android:textStyle="bold"/>-->
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingEnd="@dimen/movie_details_padding_end"
-            android:paddingStart="@dimen/movie_details_padding_start">
+            <!--<TextView-->
+                <!--android:id="@+id/movie_details_activity_textview_producer"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:paddingEnd="0dp"-->
+                <!--android:paddingStart="@dimen/movie_details_padding_start"-->
+                <!--android:textSize="16sp"-->
+                <!--android:textStyle="bold"/>-->
+        <!--</LinearLayout>-->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/movie_details_activity_producer"
-                android:textSize="16sp"
-                android:textStyle="bold"/>
+        <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:paddingEnd="@dimen/movie_details_padding_end"-->
+            <!--android:paddingStart="@dimen/movie_details_padding_start">-->
 
-            <TextView
-                android:id="@+id/movie_details_activity_textview_producer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingEnd="0dp"
-                android:paddingStart="@dimen/movie_details_padding_start"
-                android:textSize="16sp"
-                android:textStyle="bold"/>
-        </LinearLayout>
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="@string/movie_details_activity_release_date"-->
+                <!--android:textSize="16sp"-->
+                <!--android:textStyle="bold"/>-->
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingEnd="@dimen/movie_details_padding_end"
-            android:paddingStart="@dimen/movie_details_padding_start">
+            <!--<TextView-->
+                <!--android:id="@+id/movie_details_activity_textview_relese_date"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:paddingEnd="0dp"-->
+                <!--android:paddingStart="@dimen/movie_details_padding_start"-->
+                <!--android:textSize="16sp"-->
+                <!--android:textStyle="bold"/>-->
+        <!--</LinearLayout>-->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/movie_details_activity_release_date"
-                android:textSize="16sp"
-                android:textStyle="bold"/>
+        <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:paddingEnd="@dimen/movie_details_padding_end"-->
+            <!--android:paddingStart="@dimen/movie_details_padding_start">-->
 
-            <TextView
-                android:id="@+id/movie_details_activity_textview_relese_date"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingEnd="0dp"
-                android:paddingStart="@dimen/movie_details_padding_start"
-                android:textSize="16sp"
-                android:textStyle="bold"/>
-        </LinearLayout>
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="@string/movie_details_activity_score"-->
+                <!--android:textSize="16sp"-->
+                <!--android:textStyle="bold"/>-->
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingEnd="@dimen/movie_details_padding_end"
-            android:paddingStart="@dimen/movie_details_padding_start">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/movie_details_activity_score"
-                android:textSize="16sp"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:id="@+id/movie_details_activity_textview_score"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingEnd="0dp"
-                android:paddingStart="@dimen/movie_details_padding_start"
-                android:textSize="16sp"
-                android:textStyle="bold"/>
-        </LinearLayout>
+            <!--<TextView-->
+                <!--android:id="@+id/movie_details_activity_textview_score"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:paddingEnd="0dp"-->
+                <!--android:paddingStart="@dimen/movie_details_padding_start"-->
+                <!--android:textSize="16sp"-->
+                <!--android:textStyle="bold"/>-->
+        <!--</LinearLayout>-->
 
         <TextView
             android:id="@+id/movie_details_activity_textview_description"
