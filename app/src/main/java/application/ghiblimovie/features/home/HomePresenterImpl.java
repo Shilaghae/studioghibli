@@ -6,18 +6,15 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
-
-import application.ghiblimovie.base.Movie;
-import application.ghiblimovie.base.MovieRepositoryRealm;
 import application.ghiblimovie.base.AppPreferences;
 import application.ghiblimovie.base.BasePresenter;
+import application.ghiblimovie.base.Movie;
+import application.ghiblimovie.base.MovieRepositoryRealm;
 import application.ghiblimovie.services.GhibliService;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
-import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.Scheduler;
 import io.reactivex.functions.Function;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * @author anna
@@ -29,12 +26,15 @@ public class HomePresenterImpl extends BasePresenter<HomeContract.HomeView> impl
     private final GhibliService mGhibliService;
     private final AppPreferences mAppPreferences;
     private final MovieRepositoryRealm mMovieRepositoryRealm;
+    private final Scheduler mIoScheduler;
+    private final Scheduler mMainScheduler;
 
-    @Inject
-    HomePresenterImpl(final GhibliService ghibliService, final AppPreferences appPreferences, final MovieRepositoryRealm movieRepositoryRealm) {
+    HomePresenterImpl(final GhibliService ghibliService, final AppPreferences appPreferences, final MovieRepositoryRealm movieRepositoryRealm, final Scheduler ioScheduler, final Scheduler mainScheduler) {
         mGhibliService = ghibliService;
         mAppPreferences = appPreferences;
         mMovieRepositoryRealm = movieRepositoryRealm;
+        mIoScheduler = ioScheduler;
+        mMainScheduler = mainScheduler;
     }
 
     @Override
@@ -42,8 +42,8 @@ public class HomePresenterImpl extends BasePresenter<HomeContract.HomeView> impl
         super.onAttach(view);
 
         subscribe(mGhibliService.getMovies()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(mIoScheduler)
+                .observeOn(mMainScheduler)
                 .doOnError(error -> {
                     if (error instanceof UnknownHostException) {
                         // take it from the database
@@ -68,8 +68,8 @@ public class HomePresenterImpl extends BasePresenter<HomeContract.HomeView> impl
                 }, Throwable::printStackTrace));
 
         subscribe(view.onMovieItemClicked()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(mIoScheduler)
+                .observeOn(mMainScheduler)
                 .subscribe(movie -> {
                     view.showMovieDetails(movie);
                 })

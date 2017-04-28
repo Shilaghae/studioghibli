@@ -16,7 +16,8 @@ public class BasePresenter<V extends BaseView> {
     private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
 
     public void onAttach(@NonNull V view) {
-        view.init();
+        mView = view;
+        mView.init();
     }
 
     public CompositeDisposable subscribe(Disposable observable) {
