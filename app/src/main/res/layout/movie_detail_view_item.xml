@@ -7,15 +7,15 @@
               android:paddingStart="@dimen/movie_details_padding_start">
 
     <TextView
-        android:id="@+id/key"
+        android:id="@+id/movie_detail_view_key"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="16sp"
         android:textStyle="bold"/>
 
     <TextView
-        android:id="@+id/value"
-        android:layout_width="match_parent"
+        android:id="@+id/movie_detail_view_value"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingEnd="0dp"
         android:paddingStart="@dimen/movie_details_padding_start"

@@ -34,8 +34,8 @@ public class MovieDetailsActivity extends BaseActivity implements MovieDetailsCo
     @BindView(R.id.movie_details_activity_textview_description)
     TextView mDescriptionTextView;
 
-    @BindView(R.id.customView)
-    MovieDetailsView mCustomView;
+    @BindView(R.id.activity_movie_movieDetailsView_details)
+    MovieGroupDetailsView mMovieGroupDetailsView;
 
     public void init() {
     }
@@ -70,14 +70,12 @@ public class MovieDetailsActivity extends BaseActivity implements MovieDetailsCo
     @Override
     public void initMovie(final Movie movie) {
         mTitleTextView.setText(movie.getTitle());
-//        mProducerTextView.setText(movie.getProducer());
-//        mDirectorTextView.setText(movie.getDirector());
-//        mReleaseDateTextView.setText(movie.getReleaseDate());
-//        mScoreTextView.setText(movie.getScore());
         mDescriptionTextView.setText(movie.getDescription());
         HashMap<String, String> map = new HashMap<>();
-        map.put("serio", "carma");
-        map.put("serioxxå", "carmaxxx");
-        mCustomView.addViews(map);
+        map.put(getString(R.string.movie_details_activity_producer), movie.getProducer());
+        map.put(getString(R.string.movie_details_activity_director), movie.getDirector());
+        map.put(getString(R.string.movie_details_activity_release_date), movie.getReleaseDate());
+        map.put(getString(R.string.movie_details_activity_score), movie.getScore());
+        mMovieGroupDetailsView.addMovieDetailsViews(map);
     }
 }
