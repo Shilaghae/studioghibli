@@ -23,7 +23,7 @@ public class HomeModule {
 
     @Provides
     @HomeScope
-    HomePresenterImpl provideHomePresenter(final GhibliService ghibliService, final AppPreferences appPreferences, MovieRepositoryRealm movieRepositoryRealm) {
+    HomePresenterImpl provideHomePresenter(final GhibliService ghibliService, final AppPreferences appPreferences, final MovieRepositoryRealm movieRepositoryRealm) {
         return new HomePresenterImpl(ghibliService, appPreferences, movieRepositoryRealm, Schedulers.io(), AndroidSchedulers.mainThread());
     }
 
