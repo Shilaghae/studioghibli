@@ -18,8 +18,6 @@ public class HomeContract {
 
         Observable<Movie> onMovieItemClicked();
 
-        Observable<Object> onRetryConnectClicked();
-
         void showGhibliMovies(List<Movie> movies);
 
         void showErrorMessage();

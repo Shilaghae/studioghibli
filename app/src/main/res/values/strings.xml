@@ -3,7 +3,6 @@
     <string name="home_activity_error_impossible_to_retrieve_movies">Impossible to show the movies. There has been a problem!</string>
     <string name="home_activity_no_movies_to_show">There are no movies to show</string>
     <string name="home_activity_no_connection">It looks like you are offline</string>
-    <string name="home_activity_retry_connection">Retry</string>
     <string name="movie_details_activity_director">Director:</string>
     <string name="movie_details_activity_producer">Producer:</string>
     <string name="movie_details_activity_release_date">Release date:</string>

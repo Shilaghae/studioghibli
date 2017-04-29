@@ -43,7 +43,6 @@ public class HomePresenterImplTest extends BasePresenterTest<HomePresenterImpl, 
     private final PublishSubject<MovieStore> onRetrieveMovieStore = PublishSubject.create();
     private final PublishSubject<MovieStore> onUpdateMovieStore = PublishSubject.create();
     private final PublishSubject<Movie> onMovieItemClicked = PublishSubject.create();
-    private final PublishSubject<Object> onRetryConnectionClicked = PublishSubject.create();
     private final PublishSubject<Boolean> onCheckConnection = PublishSubject.create();
 
     @Override
@@ -58,7 +57,6 @@ public class HomePresenterImplTest extends BasePresenterTest<HomePresenterImpl, 
         when(mMockMovieRepositoryFactory.onMovieStoreUpdated()).thenReturn(onUpdateMovieStore);
         when(mockHomeView.onCheckConnection()).thenReturn(onCheckConnection);
         when(mockHomeView.onMovieItemClicked()).thenReturn(onMovieItemClicked);
-        when(mockHomeView.onRetryConnectClicked()).thenReturn(onRetryConnectionClicked);
         return mockHomeView;
     }
 
@@ -166,6 +164,20 @@ public class HomePresenterImplTest extends BasePresenterTest<HomePresenterImpl, 
         mPresenter.onAttach(mView);
         onCheckConnection.onNext(true);
         verify(mView).hideNoConnectionMessage();
+    }
+
+    @Test
+    public void errorWhenRetrievingMovies_showErrorMessage() {
+        mPresenter.onAttach(mView);
+        onRetrieveMovieStore.onError(new Throwable());
+        verify(mView).showErrorMessage();
+    }
+
+    @Test
+    public void errorWhenRCheckingConnection_showErrorMessage() {
+        mPresenter.onAttach(mView);
+        onCheckConnection.onError(new Throwable());
+        verify(mView).showErrorMessage();
     }
 
     @Test

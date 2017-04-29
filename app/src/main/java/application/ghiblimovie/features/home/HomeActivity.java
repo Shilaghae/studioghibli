@@ -2,16 +2,12 @@ package application.ghiblimovie.features.home;
 
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
-import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.jakewharton.rxbinding2.view.RxView;
 
 import java.util.List;
 
@@ -40,21 +36,19 @@ public class HomeActivity extends BaseActivity implements HomeContract.HomeView 
     RecyclerView mMovieListRecyclerView;
     @BindView(R.id.home_activity_textView_no_movies)
     TextView mNoMovieTextView;
-    @BindView(R.id.activity_home_button_retry)
-    Button mRetryConnectButton;
 
     private MovieListAdapter mMovieListAdapter;
 
     @Override
-    protected void onCreate(final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onResume() {
         registerReceiver(mNetworkChangeReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-    }
+        super.onResume();
 
+    }
     @Override
-    protected void onPause() {
+    protected void onStop() {
         unregisterReceiver(mNetworkChangeReceiver);
-        super.onPause();
+        super.onStop();
     }
 
     public void init() {
@@ -93,11 +87,6 @@ public class HomeActivity extends BaseActivity implements HomeContract.HomeView 
     }
 
     @Override
-    public Observable<Object> onRetryConnectClicked() {
-        return RxView.clicks(mRetryConnectButton);
-    }
-
-    @Override
     public void showErrorMessage() {
         Toast.makeText(this, getString(R.string.home_activity_error_impossible_to_retrieve_movies), Toast.LENGTH_LONG).show();
     }
@@ -105,13 +94,11 @@ public class HomeActivity extends BaseActivity implements HomeContract.HomeView 
     @Override
     public void showNoConnectionMessage() {
         mUserOfflineTextView.setVisibility(View.VISIBLE);
-        mRetryConnectButton.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideNoConnectionMessage() {
         mUserOfflineTextView.setVisibility(View.GONE);
-        mRetryConnectButton.setVisibility(View.GONE);
     }
 
     @Override

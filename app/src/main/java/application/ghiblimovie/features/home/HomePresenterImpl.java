@@ -50,12 +50,11 @@ public class HomePresenterImpl extends BasePresenter<HomeContract.HomeView> impl
                             mAppPreferences.setMovieListUpToDate(false);
                         }
                     }
-                }));
+                }, error -> view.showErrorMessage()));
 
         subscribe(view.onCheckConnection()
                 .subscribeOn(mIoScheduler)
                 .observeOn(mMainScheduler)
-                .retry()
                 .subscribe(isConnected -> {
                     this.isConnected = isConnected;
                     if (!isConnected) {
@@ -64,7 +63,7 @@ public class HomePresenterImpl extends BasePresenter<HomeContract.HomeView> impl
                         view.hideNoConnectionMessage();
                     }
                     mMovieRepositoryFactory.updateMovieStore();
-                }));
+                }, error -> view.showErrorMessage()));
 
         subscribe(view.onMovieItemClicked()
                 .subscribeOn(mIoScheduler)
