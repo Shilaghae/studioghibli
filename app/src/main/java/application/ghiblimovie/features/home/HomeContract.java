@@ -2,8 +2,8 @@ package application.ghiblimovie.features.home;
 
 import java.util.List;
 
-import application.ghiblimovie.base.Movie;
 import application.ghiblimovie.base.BaseView;
+import application.ghiblimovie.base.Movie;
 import io.reactivex.Observable;
 
 /**
@@ -14,7 +14,11 @@ public class HomeContract {
 
     public interface HomeView extends BaseView {
 
+        Observable<Boolean> onCheckConnection();
+
         Observable<Movie> onMovieItemClicked();
+
+        Observable<Object> onRetryConnectClicked();
 
         void showGhibliMovies(List<Movie> movies);
 
@@ -26,7 +30,7 @@ public class HomeContract {
 
         void showMovieDetails(Movie movie);
 
-        void showNoMovie();
+        void showNoMoviesToShowMessage();
     }
 
     public interface HomePresenter {

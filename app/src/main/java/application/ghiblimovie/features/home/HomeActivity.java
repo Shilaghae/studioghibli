@@ -1,11 +1,17 @@
 package application.ghiblimovie.features.home;
 
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.jakewharton.rxbinding2.view.RxView;
 
 import java.util.List;
 
@@ -15,6 +21,7 @@ import application.ghiblimovie.R;
 import application.ghiblimovie.base.BaseActivity;
 import application.ghiblimovie.base.BasePresenter;
 import application.ghiblimovie.base.Movie;
+import application.ghiblimovie.base.NetworkStatusChangeReceiver;
 import application.ghiblimovie.features.moviedetails.MovieDetailsActivity;
 import butterknife.BindView;
 import io.reactivex.Observable;
@@ -23,14 +30,32 @@ public class HomeActivity extends BaseActivity implements HomeContract.HomeView 
 
     @Inject
     HomePresenterImpl mHomePresenter;
+
+    @Inject
+    NetworkStatusChangeReceiver mNetworkChangeReceiver;
+
     @BindView(R.id.activity_home_textView_offline)
     TextView mUserOfflineTextView;
     @BindView(R.id.home_activity_recyclerView_movies)
     RecyclerView mMovieListRecyclerView;
     @BindView(R.id.home_activity_textView_no_movies)
     TextView mNoMovieTextView;
+    @BindView(R.id.activity_home_button_retry)
+    Button mRetryConnectButton;
 
     private MovieListAdapter mMovieListAdapter;
+
+    @Override
+    protected void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        registerReceiver(mNetworkChangeReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+
+    @Override
+    protected void onPause() {
+        unregisterReceiver(mNetworkChangeReceiver);
+        super.onPause();
+    }
 
     public void init() {
         mMovieListAdapter = new MovieListAdapter();
@@ -58,8 +83,18 @@ public class HomeActivity extends BaseActivity implements HomeContract.HomeView 
     }
 
     @Override
+    public Observable<Boolean> onCheckConnection() {
+        return mNetworkChangeReceiver.onNetworkChangeStatus();
+    }
+
+    @Override
     public Observable<Movie> onMovieItemClicked() {
         return mMovieListAdapter.onMovieItemClicked();
+    }
+
+    @Override
+    public Observable<Object> onRetryConnectClicked() {
+        return RxView.clicks(mRetryConnectButton);
     }
 
     @Override
@@ -70,11 +105,13 @@ public class HomeActivity extends BaseActivity implements HomeContract.HomeView 
     @Override
     public void showNoConnectionMessage() {
         mUserOfflineTextView.setVisibility(View.VISIBLE);
+        mRetryConnectButton.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideNoConnectionMessage() {
         mUserOfflineTextView.setVisibility(View.GONE);
+        mRetryConnectButton.setVisibility(View.GONE);
     }
 
     @Override
@@ -90,7 +127,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.HomeView 
     }
 
     @Override
-    public void showNoMovie() {
+    public void showNoMoviesToShowMessage() {
         mNoMovieTextView.setVisibility(View.VISIBLE);
     }
 

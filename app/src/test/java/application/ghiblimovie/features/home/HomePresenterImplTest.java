@@ -3,15 +3,17 @@ package application.ghiblimovie.features.home;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
 import application.ghiblimovie.base.AppPreferences;
 import application.ghiblimovie.base.BasePresenterTest;
 import application.ghiblimovie.base.Movie;
-import application.ghiblimovie.base.MovieRepositoryRealm;
-import application.ghiblimovie.services.GhibliService;
+import application.ghiblimovie.repositories.DiskMovieStore;
+import application.ghiblimovie.repositories.MovieRepositoryFactory;
+import application.ghiblimovie.repositories.MovieStore;
+import application.ghiblimovie.repositories.NetworkMovieStore;
+import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 
@@ -27,74 +29,143 @@ import static org.mockito.Mockito.when;
 public class HomePresenterImplTest extends BasePresenterTest<HomePresenterImpl, HomeContract.HomeView> {
 
     @Mock
-    private GhibliService mMockGhibliService;
-
-    @Mock
     private AppPreferences mMockAppPreferences;
 
     @Mock
-    private MovieRepositoryRealm mMockMovieRepositoryRealm;
+    private MovieRepositoryFactory mMockMovieRepositoryFactory;
 
-    private final PublishSubject<List<Movie>> onRetrieveMovies = PublishSubject.create();
+    @Mock
+    private NetworkMovieStore mNetworkMovieStore;
+
+    @Mock
+    private DiskMovieStore mDiskMovieStore;
+
+    private final PublishSubject<MovieStore> onRetrieveMovieStore = PublishSubject.create();
+    private final PublishSubject<MovieStore> onUpdateMovieStore = PublishSubject.create();
     private final PublishSubject<Movie> onMovieItemClicked = PublishSubject.create();
+    private final PublishSubject<Object> onRetryConnectionClicked = PublishSubject.create();
+    private final PublishSubject<Boolean> onCheckConnection = PublishSubject.create();
 
     @Override
     protected HomePresenterImpl createPresenter() {
-        return new HomePresenterImpl(mMockGhibliService, mMockAppPreferences, mMockMovieRepositoryRealm, Schedulers.trampoline(), Schedulers.trampoline());
+        return new HomePresenterImpl(mMockAppPreferences, mMockMovieRepositoryFactory, Schedulers.trampoline(), Schedulers.trampoline());
     }
 
     @Override
     protected HomeContract.HomeView createView() {
         final HomeContract.HomeView mockHomeView = mock(HomeContract.HomeView.class);
-        when(mMockGhibliService.getMovies()).thenReturn(onRetrieveMovies);
+        when(mMockMovieRepositoryFactory.onMovieStore()).thenReturn(onRetrieveMovieStore);
+        when(mMockMovieRepositoryFactory.onMovieStoreUpdated()).thenReturn(onUpdateMovieStore);
+        when(mockHomeView.onCheckConnection()).thenReturn(onCheckConnection);
         when(mockHomeView.onMovieItemClicked()).thenReturn(onMovieItemClicked);
+        when(mockHomeView.onRetryConnectClicked()).thenReturn(onRetryConnectionClicked);
         return mockHomeView;
     }
 
     @Test
-    public void getMoviesFromInternet_ShowMovies() {
-        mPresenter.onAttach(mView);
+    public void getMoviesFromInternet_MoMoviesToShow() {
         List<Movie> movies = new ArrayList<>();
-        onRetrieveMovies.onNext(movies);
-        verify(mView).showGhibliMovies(movies);
-        verify(mView).hideNoConnectionMessage();
+        when(mNetworkMovieStore.getMovies()).thenReturn(Observable.just(movies));
+        mPresenter.onAttach(mView);
+        onRetrieveMovieStore.onNext(mNetworkMovieStore);
+        verify(mView).showNoMoviesToShowMessage();
     }
 
     @Test
-    public void getMoviesFromDisk_ShowMovies() {
+    public void getMoviesFromInternet_ShowTheMoviesRetrieved() {
         List<Movie> movies = new ArrayList<>();
-        when(mMockMovieRepositoryRealm.getAllMovies()).thenReturn(movies);
+        Movie movie1 = new Movie();
+        movie1.setDescription("This is actually a test!");
+        movies.add(movie1);
+        when(mNetworkMovieStore.getMovies()).thenReturn(Observable.just(movies));
         mPresenter.onAttach(mView);
-        onRetrieveMovies.onError(new UnknownHostException());
+        onRetrieveMovieStore.onNext(mNetworkMovieStore);
         verify(mView).showGhibliMovies(movies);
-        verify(mView).showNoConnectionMessage();
-        verify(mMockAppPreferences).setMovieListUpToDate(false);
+    }
+
+    @Test
+    public void getMoviesFromDisk_ShowNoMovies() {
+        List<Movie> movies = new ArrayList<>();
+        when(mDiskMovieStore.getMovies()).thenReturn(Observable.just(movies));
+        mPresenter.onAttach(mView);
+        onRetrieveMovieStore.onNext(mDiskMovieStore);
+        verify(mView).showNoMoviesToShowMessage();
+    }
+
+    @Test
+    public void getMoviesFromDisk_ShowTheMoviesRetrieved() {
+        List<Movie> movies = new ArrayList<>();
+        Movie movie1 = new Movie();
+        movie1.setDescription("This is actually a test!");
+        movies.add(movie1);
+        when(mNetworkMovieStore.getMovies()).thenReturn(Observable.just(movies));
+        mPresenter.onAttach(mView);
+        onRetrieveMovieStore.onNext(mNetworkMovieStore);
+        verify(mView).showGhibliMovies(movies);
     }
 
     @Test
     public void getMoviesFromInternetAndRepositoryIsNotUpdated_UpdateLocalMovieRepository() {
+        List<Movie> movies = new ArrayList<>();
+        Movie movie1 = new Movie();
+        movie1.setDescription("This is actually a test!");
+        movies.add(movie1);
+        when(mNetworkMovieStore.getMovies()).thenReturn(Observable.just(movies));
         when(mMockAppPreferences.isMovieListUpToDate()).thenReturn(false);
         mPresenter.onAttach(mView);
-        List<Movie> movies = new ArrayList<>();
-        onRetrieveMovies.onNext(movies);
+        onCheckConnection.onNext(true);
+        onRetrieveMovieStore.onNext(mNetworkMovieStore);
+        verify(mMockMovieRepositoryFactory).updateMovieStore();
         verify(mView).showGhibliMovies(movies);
-        verify(mView).hideNoConnectionMessage();
-        verify(mMockMovieRepositoryRealm).removeAllMovies();
-        verify(mMockMovieRepositoryRealm).addAllMovies(movies);
+        verify(mMockMovieRepositoryFactory).updateAllMovieStore(movies);
         verify(mMockAppPreferences).setMovieListUpToDate(true);
     }
 
     @Test
     public void getMoviesFromInternetAndRepositoryIsUpdated_DoesNotUpdateLocalMovieRepository() {
+        List<Movie> movies = new ArrayList<>();
+        Movie movie1 = new Movie();
+        movie1.setDescription("This is actually a test!");
+        movies.add(movie1);
+        when(mNetworkMovieStore.getMovies()).thenReturn(Observable.just(movies));
         when(mMockAppPreferences.isMovieListUpToDate()).thenReturn(true);
         mPresenter.onAttach(mView);
-        List<Movie> movies = new ArrayList<>();
-        onRetrieveMovies.onNext(movies);
+        onCheckConnection.onNext(true);
+        onRetrieveMovieStore.onNext(mNetworkMovieStore);
+        verify(mMockMovieRepositoryFactory).updateMovieStore();
         verify(mView).showGhibliMovies(movies);
-        verify(mView).hideNoConnectionMessage();
-        verify(mMockMovieRepositoryRealm, never()).removeAllMovies();
-        verify(mMockMovieRepositoryRealm, never()).addAllMovies(movies);
+        verify(mMockMovieRepositoryFactory, never()).updateAllMovieStore(movies);
         verify(mMockAppPreferences, never()).setMovieListUpToDate(true);
+    }
+
+    @Test
+    public void getMoviesWhenThereIsNoConnection_TheRepositoryMustBeUpdated() {
+        List<Movie> movies = new ArrayList<>();
+        Movie movie1 = new Movie();
+        movie1.setDescription("This is actually a test!");
+        movies.add(movie1);
+        when(mDiskMovieStore.getMovies()).thenReturn(Observable.just(movies));
+        mPresenter.onAttach(mView);
+        onCheckConnection.onNext(false);
+        onRetrieveMovieStore.onNext(mDiskMovieStore);
+        verify(mMockMovieRepositoryFactory).updateMovieStore();
+        verify(mView).showNoConnectionMessage();
+        verify(mView).showGhibliMovies(movies);
+        verify(mMockAppPreferences).setMovieListUpToDate(false);
+    }
+
+    @Test
+    public void noConnectionAvailable_showNoConnectionMessage() {
+        mPresenter.onAttach(mView);
+        onCheckConnection.onNext(false);
+        verify(mView).showNoConnectionMessage();
+    }
+
+    @Test
+    public void connectionAvailable_hideConnectionMessage() {
+        mPresenter.onAttach(mView);
+        onCheckConnection.onNext(true);
+        verify(mView).hideNoConnectionMessage();
     }
 
     @Test

@@ -2,19 +2,12 @@ package application.ghiblimovie.features.home;
 
 import android.support.annotation.NonNull;
 
-import java.net.UnknownHostException;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import application.ghiblimovie.base.AppPreferences;
 import application.ghiblimovie.base.BasePresenter;
-import application.ghiblimovie.base.Movie;
-import application.ghiblimovie.base.MovieRepositoryRealm;
-import application.ghiblimovie.services.GhibliService;
+import application.ghiblimovie.repositories.MovieRepositoryFactory;
+import application.ghiblimovie.repositories.MovieStore;
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.reactivex.Scheduler;
-import io.reactivex.functions.Function;
 
 /**
  * @author anna
@@ -22,17 +15,15 @@ import io.reactivex.functions.Function;
 
 public class HomePresenterImpl extends BasePresenter<HomeContract.HomeView> implements HomeContract.HomePresenter {
 
-    public static final long RETRY_ON_ERROR = 10000L;
-    private final GhibliService mGhibliService;
     private final AppPreferences mAppPreferences;
-    private final MovieRepositoryRealm mMovieRepositoryRealm;
+    private final MovieRepositoryFactory mMovieRepositoryFactory;
     private final Scheduler mIoScheduler;
     private final Scheduler mMainScheduler;
+    private boolean isConnected;
 
-    HomePresenterImpl(final GhibliService ghibliService, final AppPreferences appPreferences, final MovieRepositoryRealm movieRepositoryRealm, final Scheduler ioScheduler, final Scheduler mainScheduler) {
-        mGhibliService = ghibliService;
+    HomePresenterImpl(final AppPreferences appPreferences, final MovieRepositoryFactory movieRepositoryFactory, final Scheduler ioScheduler, final Scheduler mainScheduler) {
         mAppPreferences = appPreferences;
-        mMovieRepositoryRealm = movieRepositoryRealm;
+        mMovieRepositoryFactory = movieRepositoryFactory;
         mIoScheduler = ioScheduler;
         mMainScheduler = mainScheduler;
     }
@@ -40,40 +31,40 @@ public class HomePresenterImpl extends BasePresenter<HomeContract.HomeView> impl
     @Override
     public void onAttach(@NonNull final HomeContract.HomeView view) {
         super.onAttach(view);
+        subscribe(Observable.merge(mMovieRepositoryFactory.onMovieStore(), mMovieRepositoryFactory.onMovieStoreUpdated())
+                .observeOn(mMainScheduler)
+                .flatMap(MovieStore::getMovies)
+                .observeOn(mMainScheduler)
+                .subscribeOn(mIoScheduler)
+                .subscribe(movies -> {
+                    if (movies.isEmpty()) {
+                        view.showNoMoviesToShowMessage();
+                    } else {
+                        view.showGhibliMovies(movies);
+                        if (isConnected) {
+                            if (!mAppPreferences.isMovieListUpToDate()) {
+                                mAppPreferences.setMovieListUpToDate(true);
+                                mMovieRepositoryFactory.updateAllMovieStore(movies);
+                            }
+                        } else {
+                            mAppPreferences.setMovieListUpToDate(false);
+                        }
+                    }
+                }));
 
-        subscribe(mGhibliService.getMovies()
+        subscribe(view.onCheckConnection()
                 .subscribeOn(mIoScheduler)
                 .observeOn(mMainScheduler)
-                .doOnError(error -> {
-                    if (error instanceof UnknownHostException) {
-                        // take it from the database
-                        List<Movie> movies = mMovieRepositoryRealm.getAllMovies();
-                        if (!movies.isEmpty()) {
-                            view.showGhibliMovies(movies);
-                        } else {
-                            view.showNoMovie();
-                        }
+                .retry()
+                .subscribe(isConnected -> {
+                    this.isConnected = isConnected;
+                    if (!isConnected) {
                         view.showNoConnectionMessage();
-                        mAppPreferences.setMovieListUpToDate(false);
                     } else {
-                        view.showErrorMessage();
+                        view.hideNoConnectionMessage();
                     }
-                })
-                .retryWhen(throwableObservable -> throwableObservable.flatMap((Function<Throwable, ObservableSource<?>>) throwable -> Observable.timer(RETRY_ON_ERROR, TimeUnit.MILLISECONDS)))
-                .subscribe(movies -> {
-                    view.hideNoConnectionMessage();
-                    if (!movies.isEmpty()) {
-                        view.showGhibliMovies(movies);
-                        if (!mAppPreferences.isMovieListUpToDate()) {
-                            // Change file
-                            mMovieRepositoryRealm.removeAllMovies();
-                            mMovieRepositoryRealm.addAllMovies(movies);
-                            mAppPreferences.setMovieListUpToDate(true);
-                        }
-                    } else {
-                        view.showNoMovie();
-                    }
-                }, Throwable::printStackTrace));
+                    mMovieRepositoryFactory.updateMovieStore();
+                }));
 
         subscribe(view.onMovieItemClicked()
                 .subscribeOn(mIoScheduler)

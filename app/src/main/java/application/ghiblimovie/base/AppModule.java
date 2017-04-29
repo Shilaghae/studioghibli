@@ -35,6 +35,11 @@ public class AppModule {
     }
 
     @Provides
+    NetworkStatusChangeReceiver provideNetworkStatusChangeReceiver() {
+        return new NetworkStatusChangeReceiver();
+    }
+
+    @Provides
     MovieRepositoryRealm provideMovieRepositoryRealm(final Context context) {
         return new MovieRepositoryRealm(context);
     }

@@ -16,19 +16,25 @@
         android:text="@string/home_activity_no_connection"
         android:textColor="@android:color/white"
         android:textStyle="bold"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/home_activity_recyclerView_movies"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
+    <Button
+        android:id="@+id/activity_home_button_retry"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:background="#f45c42"
+        android:text="@string/home_activity_retry_connection"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:visibility="visible"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/activity_home_textView_offline"/>
+        app:layout_constraintLeft_toLeftOf="@+id/activity_home_textView_offline"
+        app:layout_constraintBaseline_toBaselineOf="@+id/activity_home_textView_offline"
+        tools:layout_editor_absoluteY="0dp"/>
 
     <TextView
         android:id="@+id/home_activity_textView_no_movies"
@@ -41,5 +47,16 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/home_activity_recyclerView_movies"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/activity_home_textView_offline"
+        app:layout_constraintVertical_bias="0.0"/>
 
 </android.support.constraint.ConstraintLayout>

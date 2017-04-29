@@ -1,7 +1,10 @@
 package application.ghiblimovie.features.home;
 
+import android.content.Context;
+
 import application.ghiblimovie.base.AppPreferences;
 import application.ghiblimovie.base.MovieRepositoryRealm;
+import application.ghiblimovie.repositories.MovieRepositoryFactory;
 import application.ghiblimovie.services.GhibliService;
 import dagger.Module;
 import dagger.Provides;
@@ -23,8 +26,14 @@ public class HomeModule {
 
     @Provides
     @HomeScope
-    HomePresenterImpl provideHomePresenter(final GhibliService ghibliService, final AppPreferences appPreferences, final MovieRepositoryRealm movieRepositoryRealm) {
-        return new HomePresenterImpl(ghibliService, appPreferences, movieRepositoryRealm, Schedulers.io(), AndroidSchedulers.mainThread());
+    MovieRepositoryFactory provideMovieStore(final Context context, final GhibliService ghibliService, final MovieRepositoryRealm movieRepositoryRealm) {
+        return new MovieRepositoryFactory(ghibliService, movieRepositoryRealm, context);
+    }
+
+    @Provides
+    @HomeScope
+    HomePresenterImpl provideHomePresenter(final AppPreferences appPreferences, final MovieRepositoryFactory movieRepositoryFactory) {
+        return new HomePresenterImpl(appPreferences, movieRepositoryFactory, Schedulers.io(), AndroidSchedulers.mainThread());
     }
 
 }

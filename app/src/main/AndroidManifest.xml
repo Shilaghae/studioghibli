@@ -3,6 +3,8 @@
           package="application.ghiblimovie">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:name="application.ghiblimovie.base.AppApplication"
         android:allowBackup="true"
@@ -19,6 +21,13 @@
             </intent-filter>
         </activity>
         <activity android:name="application.ghiblimovie.features.moviedetails.MovieDetailsActivity"/>
+        <receiver
+            android:name=".base.NetworkStatusChangeReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
