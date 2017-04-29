@@ -1,4 +1,4 @@
-package application.ghiblimovie.base;
+package application.ghiblimovie.repositories;
 
 import android.os.Parcel;
 import android.os.Parcelable;

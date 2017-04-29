@@ -8,7 +8,7 @@ import java.util.List;
 
 import application.ghiblimovie.base.AppPreferences;
 import application.ghiblimovie.base.BasePresenterTest;
-import application.ghiblimovie.base.Movie;
+import application.ghiblimovie.repositories.Movie;
 import application.ghiblimovie.repositories.DiskMovieStore;
 import application.ghiblimovie.repositories.MovieRepositoryFactory;
 import application.ghiblimovie.repositories.MovieStore;

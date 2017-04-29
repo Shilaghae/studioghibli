@@ -3,7 +3,7 @@ package application.ghiblimovie.features.home;
 import java.util.List;
 
 import application.ghiblimovie.base.BaseView;
-import application.ghiblimovie.base.Movie;
+import application.ghiblimovie.repositories.Movie;
 import io.reactivex.Observable;
 
 /**

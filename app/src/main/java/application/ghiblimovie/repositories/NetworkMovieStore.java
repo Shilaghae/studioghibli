@@ -2,7 +2,6 @@ package application.ghiblimovie.repositories;
 
 import java.util.List;
 
-import application.ghiblimovie.base.Movie;
 import application.ghiblimovie.services.GhibliService;
 import io.reactivex.Observable;
 

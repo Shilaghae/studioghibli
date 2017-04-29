@@ -1,6 +1,6 @@
 package application.ghiblimovie.features.moviedetails;
 
-import application.ghiblimovie.base.Movie;
+import application.ghiblimovie.repositories.Movie;
 import dagger.Module;
 import dagger.Provides;
 

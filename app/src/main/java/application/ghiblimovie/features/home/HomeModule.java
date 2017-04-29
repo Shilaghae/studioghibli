@@ -3,7 +3,7 @@ package application.ghiblimovie.features.home;
 import android.content.Context;
 
 import application.ghiblimovie.base.AppPreferences;
-import application.ghiblimovie.base.MovieRepositoryRealm;
+import application.ghiblimovie.repositories.MovieRepositoryRealm;
 import application.ghiblimovie.repositories.MovieRepositoryFactory;
 import application.ghiblimovie.services.GhibliService;
 import dagger.Module;

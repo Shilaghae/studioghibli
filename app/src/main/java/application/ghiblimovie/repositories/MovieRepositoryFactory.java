@@ -6,8 +6,6 @@ import android.net.NetworkInfo;
 
 import java.util.List;
 
-import application.ghiblimovie.base.Movie;
-import application.ghiblimovie.base.MovieRepositoryRealm;
 import application.ghiblimovie.services.GhibliService;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;

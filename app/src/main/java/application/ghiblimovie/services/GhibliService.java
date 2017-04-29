@@ -2,7 +2,7 @@ package application.ghiblimovie.services;
 
 import java.util.List;
 
-import application.ghiblimovie.base.Movie;
+import application.ghiblimovie.repositories.Movie;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;

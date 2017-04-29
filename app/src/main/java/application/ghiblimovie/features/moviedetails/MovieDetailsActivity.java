@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 import javax.inject.Inject;
 
-import application.ghiblimovie.base.Movie;
+import application.ghiblimovie.repositories.Movie;
 import application.ghiblimovie.R;
 import application.ghiblimovie.base.BaseActivity;
 import application.ghiblimovie.base.BasePresenter;

@@ -2,7 +2,7 @@ package application.ghiblimovie.features.moviedetails;
 
 import android.support.annotation.NonNull;
 
-import application.ghiblimovie.base.Movie;
+import application.ghiblimovie.repositories.Movie;
 import application.ghiblimovie.base.BasePresenter;
 
 /**

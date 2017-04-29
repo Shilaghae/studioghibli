@@ -1,4 +1,4 @@
-package application.ghiblimovie.base;
+package application.ghiblimovie.repositories;
 
 import android.content.Context;
 

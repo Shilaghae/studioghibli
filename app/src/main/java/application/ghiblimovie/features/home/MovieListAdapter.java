@@ -9,7 +9,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import application.ghiblimovie.base.Movie;
+import application.ghiblimovie.repositories.Movie;
 import application.ghiblimovie.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
