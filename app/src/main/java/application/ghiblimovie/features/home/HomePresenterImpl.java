@@ -13,7 +13,7 @@ import io.reactivex.Scheduler;
  * @author anna
  */
 
-public class HomePresenterImpl extends BasePresenter<HomeContract.HomeView> implements HomeContract.HomePresenter {
+public class HomePresenterImpl extends BasePresenter<HomeContract.HomeView>  {
 
     private final AppPreferences mAppPreferences;
     private final MovieRepositoryFactory mMovieRepositoryFactory;

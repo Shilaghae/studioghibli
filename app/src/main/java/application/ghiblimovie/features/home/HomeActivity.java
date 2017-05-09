@@ -22,7 +22,7 @@ import application.ghiblimovie.features.moviedetails.MovieDetailsActivity;
 import butterknife.BindView;
 import io.reactivex.Observable;
 
-public class HomeActivity extends BaseActivity implements HomeContract.HomeView {
+public class HomeActivity extends BaseActivity<HomeContract.HomeView> implements HomeContract.HomeView {
 
     @Inject
     HomePresenterImpl mHomePresenter;

@@ -3,6 +3,7 @@ package application.ghiblimovie.base;
 import android.app.Application;
 import android.content.Context;
 
+import application.ghiblimovie.photorepository.PhotoRepository;
 import application.ghiblimovie.repositories.MovieRepositoryRealm;
 import dagger.Module;
 import dagger.Provides;
@@ -43,5 +44,10 @@ public class AppModule {
     @Provides
     MovieRepositoryRealm provideMovieRepositoryRealm(final Context context) {
         return new MovieRepositoryRealm(context);
+    }
+
+    @Provides
+    PhotoRepository providePhotoRepository(final Context context) {
+        return new PhotoRepository(context);
     }
 }

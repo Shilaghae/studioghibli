@@ -6,6 +6,8 @@ import application.ghiblimovie.features.home.HomeComponent;
 import application.ghiblimovie.features.home.HomeModule;
 import application.ghiblimovie.features.moviedetails.MovieDetailsComponent;
 import application.ghiblimovie.features.moviedetails.MovieDetailsModule;
+import application.ghiblimovie.features.photohome.PhotoHomeComponent;
+import application.ghiblimovie.features.photohome.PhotoHomeModule;
 import dagger.Component;
 
 /**
@@ -19,4 +21,7 @@ public interface AppComponent {
     HomeComponent getHomeComponent(HomeModule homeModule);
 
     MovieDetailsComponent getMovieDetailsComponent(MovieDetailsModule movieDetailsModule);
+
+    PhotoHomeComponent getPhotoHomeComponent(PhotoHomeModule photoHomeModule);
+
 }
