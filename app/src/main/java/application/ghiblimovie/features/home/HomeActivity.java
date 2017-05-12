@@ -40,15 +40,15 @@ public class HomeActivity extends BaseActivity implements HomeContract.HomeView 
     private MovieListAdapter mMovieListAdapter;
 
     @Override
-    protected void onResume() {
+    protected void onStart() {
         registerReceiver(mNetworkChangeReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-        super.onResume();
+        super.onStart();
 
     }
     @Override
-    protected void onStop() {
+    protected void onPause() {
         unregisterReceiver(mNetworkChangeReceiver);
-        super.onStop();
+        super.onPause();
     }
 
     public void init() {
