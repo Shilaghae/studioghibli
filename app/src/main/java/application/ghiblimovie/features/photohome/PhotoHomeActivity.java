@@ -1,11 +1,13 @@
 package application.ghiblimovie.features.photohome;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.widget.Toast;
 
 import com.jakewharton.rxbinding2.view.RxView;
@@ -55,9 +57,15 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
 
     @Override
     public void init() {
-        photoAdapter = new PhotoAdapter(new ArrayList<>());
-        photoListRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        photoAdapter = new PhotoAdapter(new ArrayList<>(), getSpanWidth());
+        photoListRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         photoListRecyclerView.setAdapter(photoAdapter);
+    }
+
+    private float getSpanWidth() {
+        Resources resources = getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        return (metrics.widthPixels / 3);
     }
 
     @Override

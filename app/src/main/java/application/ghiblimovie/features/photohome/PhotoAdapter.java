@@ -1,5 +1,6 @@
 package application.ghiblimovie.features.photohome;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
@@ -23,14 +24,19 @@ import butterknife.ButterKnife;
 public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder> {
 
     private final List<Photo> mPhotos;
+    private final float mSquare;
 
-    public PhotoAdapter(List<Photo> photos) {
+    public PhotoAdapter(List<Photo> photos, float square) {
         mPhotos = photos;
+        mSquare = square;
     }
+
+    private float dp;
 
     @Override
     public PhotoHolder onCreateViewHolder(final ViewGroup parent, final int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.photo_item, parent, false);
+        Context context = parent.getContext();
+        View view = LayoutInflater.from(context).inflate(R.layout.photo_item, parent, false);
         return new PhotoHolder(view);
     }
 
@@ -38,7 +44,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
     public void onBindViewHolder(final PhotoHolder holder, final int position) {
         final Photo photo = mPhotos.get(position);
         final String photoPath = photo.getPhotoPath();
-        Bitmap thumbnail = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(photoPath), 100, 100);
+        Bitmap thumbnail = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(photoPath), (int) mSquare, (int) mSquare);
         holder.setPhotoImage(thumbnail);
     }
 
@@ -49,7 +55,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
 
     public void addPhoto(final Photo photo) {
         mPhotos.add(photo);
-        notifyItemChanged(mPhotos.size()-1);
+        notifyItemChanged(mPhotos.size() - 1);
     }
 
     public void addPhotos(final List<Photo> photos) {
