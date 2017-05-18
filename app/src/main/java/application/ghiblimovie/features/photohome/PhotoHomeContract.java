@@ -1,6 +1,7 @@
 package application.ghiblimovie.features.photohome;
 
 import java.io.IOException;
+import java.util.List;
 
 import application.ghiblimovie.base.BaseView;
 import application.ghiblimovie.photorepository.Photo;
@@ -14,15 +15,17 @@ class PhotoHomeContract {
 
     interface PhotoHomeView extends BaseView {
 
-        Observable<Object> clickOnTakeAPicture();
+        Observable<Object> onTakeAPicture();
 
         Observable<String> onAddPhoto();
 
-        void takePictures() throws IOException;
+        void takeAPicture() throws IOException;
 
         void showErrorMessage();
 
         void updatePhotoList(Photo photo);
+
+        void updatePhotoList(List<Photo> photos);
     }
 
     interface PhotoPresenter {

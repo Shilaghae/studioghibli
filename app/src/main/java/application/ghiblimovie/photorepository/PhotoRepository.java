@@ -4,6 +4,7 @@ import android.content.Context;
 
 import java.util.List;
 
+import io.reactivex.Observable;
 import io.realm.Realm;
 
 /**
@@ -19,8 +20,8 @@ public class PhotoRepository {
         mRealm = Realm.getDefaultInstance();
     }
 
-    public List<Photo> getAllPhotos() {
-        return mRealm.where(Photo.class).findAll();
+    public Observable<List<Photo>> getAllPhotos() {
+        return Observable.just(mRealm.where(Photo.class).findAll());
     }
 
     public void addPhoto(final Photo photo) {

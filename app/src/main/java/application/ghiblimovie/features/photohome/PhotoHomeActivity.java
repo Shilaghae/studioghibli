@@ -1,7 +1,6 @@
 package application.ghiblimovie.features.photohome;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
@@ -16,6 +15,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -36,27 +36,28 @@ import static android.os.Environment.DIRECTORY_PICTURES;
 public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeView> implements PhotoHomeContract.PhotoHomeView {
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
+    public static final String APPLICATION_GHIBLIMOVIE_FILEPROVIDER = "application.ghiblimovie.fileprovider";
 
     @Inject
-    PhotoHomePresenterImpl mPresenter;
+    PhotoHomePresenterImpl presenter;
 
     @BindView(R.id.photohome_activity_recyclerview_photos)
-    RecyclerView mPhotoListRecyclerView;
+    RecyclerView photoListRecyclerView;
 
     @BindView(R.id.photohome_activity_button_take_picture)
-    FloatingActionButton mTakePictureFloatingButton;
+    FloatingActionButton takePictureFloatingButton;
 
-    private PublishSubject<String> mOnAddPhoto = PublishSubject.create();
+    private PublishSubject<String> onAddPicurePublishSubject = PublishSubject.create();
 
     private PhotoAdapter photoAdapter;
 
-    private String mCurrentPhotoPath;
+    private String pictureAbsolutePath;
 
     @Override
     public void init() {
         photoAdapter = new PhotoAdapter(new ArrayList<>());
-        mPhotoListRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        mPhotoListRecyclerView.setAdapter(photoAdapter);
+        photoListRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        photoListRecyclerView.setAdapter(photoAdapter);
     }
 
     @Override
@@ -71,7 +72,7 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
 
     @Override
     public PhotoHomePresenterImpl getPresenter() {
-        return mPresenter;
+        return presenter;
     }
 
     @Override
@@ -80,20 +81,19 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
     }
 
     @Override
-    public Observable<Object> clickOnTakeAPicture() {
-        return RxView.clicks(mTakePictureFloatingButton);
+    public Observable<Object> onTakeAPicture() {
+        return RxView.clicks(takePictureFloatingButton);
     }
 
     @Override
-    public void takePictures() throws IOException {
-        final Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            final File photoFile;
-                photoFile = createImageFile();
-            if (photoFile != null) {
-                final Uri photoURI = FileProvider.getUriForFile(this, "application.ghiblimovie.fileprovider", photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+    public void takeAPicture() throws IOException {
+        final Intent takeAPictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takeAPictureIntent.resolveActivity(getPackageManager()) != null) {
+            final File picture = createImageFile();
+            if (picture != null) {
+                pictureAbsolutePath = picture.getAbsolutePath();
+                takeAPictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(this, APPLICATION_GHIBLIMOVIE_FILEPROVIDER, picture));
+                startActivityForResult(takeAPictureIntent, REQUEST_IMAGE_CAPTURE);
             }
         }
     }
@@ -109,24 +109,25 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
     }
 
     @Override
+    public void updatePhotoList(final List<Photo> photos) {
+        photoAdapter.addPhotos(photos);
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Toast.makeText(this, mCurrentPhotoPath, Toast.LENGTH_SHORT).show();
-            mOnAddPhoto.onNext(mCurrentPhotoPath);
+            Toast.makeText(this, pictureAbsolutePath, Toast.LENGTH_SHORT).show();
+            onAddPicurePublishSubject.onNext(pictureAbsolutePath);
         }
     }
 
     @Override
     public Observable<String> onAddPhoto() {
-        return mOnAddPhoto;
+        return onAddPicurePublishSubject;
     }
 
     private File createImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.UK).format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir =  getExternalFilesDir(DIRECTORY_PICTURES);
-        File image = File.createTempFile(imageFileName, ".jpg", storageDir);
-        mCurrentPhotoPath = image.getAbsolutePath();
-        return image;
+        String pictureFileName = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.UK).format(new Date()) + "_";
+        return File.createTempFile(pictureFileName, ".jpg", getExternalFilesDir(DIRECTORY_PICTURES));
     }
 }

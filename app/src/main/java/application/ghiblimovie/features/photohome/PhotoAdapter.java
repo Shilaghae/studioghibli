@@ -47,9 +47,14 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
         return mPhotos.size();
     }
 
-    public void addPhoto(Photo photo) {
+    public void addPhoto(final Photo photo) {
         mPhotos.add(photo);
         notifyItemChanged(mPhotos.size()-1);
+    }
+
+    public void addPhotos(final List<Photo> photos) {
+        mPhotos.addAll(photos);
+        notifyDataSetChanged();
     }
 
     class PhotoHolder extends RecyclerView.ViewHolder {
