@@ -1,10 +1,11 @@
 package application.ghiblimovie.features.photohome;
 
+import android.graphics.Bitmap;
+
 import java.io.IOException;
 import java.util.List;
 
 import application.ghiblimovie.base.BaseView;
-import application.ghiblimovie.photorepository.Photo;
 import io.reactivex.Observable;
 
 /**
@@ -23,9 +24,9 @@ class PhotoHomeContract {
 
         void showErrorMessage();
 
-        void updatePhotoList(Photo photo);
+        void updatePhotoList(Bitmap photo);
 
-        void updatePhotoList(List<Photo> photos);
+        void updatePhotoList(List<Bitmap> photos);
     }
 
     interface PhotoPresenter {

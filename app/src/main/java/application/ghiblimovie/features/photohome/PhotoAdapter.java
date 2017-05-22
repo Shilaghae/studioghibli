@@ -2,18 +2,16 @@ package application.ghiblimovie.features.photohome;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.ThumbnailUtils;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import application.ghiblimovie.R;
-import application.ghiblimovie.photorepository.Photo;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -23,15 +21,7 @@ import butterknife.ButterKnife;
 
 public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder> {
 
-    private final List<Photo> mPhotos;
-    private final float mSquare;
-
-    public PhotoAdapter(List<Photo> photos, float square) {
-        mPhotos = photos;
-        mSquare = square;
-    }
-
-    private float dp;
+    private final List<Bitmap> mPhotos = new ArrayList<>();
 
     @Override
     public PhotoHolder onCreateViewHolder(final ViewGroup parent, final int viewType) {
@@ -42,10 +32,8 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
 
     @Override
     public void onBindViewHolder(final PhotoHolder holder, final int position) {
-        final Photo photo = mPhotos.get(position);
-        final String photoPath = photo.getPhotoPath();
-        Bitmap thumbnail = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(photoPath), (int) mSquare, (int) mSquare);
-        holder.setPhotoImage(thumbnail);
+        final Bitmap bitmap = mPhotos.get(position);
+        holder.setPhotoImage(bitmap);
     }
 
     @Override
@@ -53,12 +41,12 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
         return mPhotos.size();
     }
 
-    public void addPhoto(final Photo photo) {
+    public void addPhoto(final Bitmap photo) {
         mPhotos.add(photo);
         notifyItemChanged(mPhotos.size() - 1);
     }
 
-    public void addPhotos(final List<Photo> photos) {
+    public void addPhotos(final List<Bitmap> photos) {
         mPhotos.addAll(photos);
         notifyDataSetChanged();
     }

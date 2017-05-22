@@ -1,21 +1,21 @@
 package application.ghiblimovie.features.photohome;
 
+import com.jakewharton.rxbinding2.view.RxView;
+
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.DisplayMetrics;
 import android.widget.Toast;
-
-import com.jakewharton.rxbinding2.view.RxView;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -24,7 +24,6 @@ import javax.inject.Inject;
 
 import application.ghiblimovie.R;
 import application.ghiblimovie.base.BaseActivity;
-import application.ghiblimovie.photorepository.Photo;
 import butterknife.BindView;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
@@ -35,10 +34,12 @@ import static android.os.Environment.DIRECTORY_PICTURES;
  * @author anna
  */
 
-public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeView> implements PhotoHomeContract.PhotoHomeView {
+public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeView>
+        implements PhotoHomeContract.PhotoHomeView {
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     public static final String APPLICATION_GHIBLIMOVIE_FILEPROVIDER = "application.ghiblimovie.fileprovider";
+    public static final int NUM_COLUMNS = 3;
 
     @Inject
     PhotoHomePresenterImpl presenter;
@@ -57,15 +58,15 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
 
     @Override
     public void init() {
-        photoAdapter = new PhotoAdapter(new ArrayList<>(), getSpanWidth());
-        photoListRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        photoAdapter = new PhotoAdapter();
+        photoListRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(3, 1));
         photoListRecyclerView.setAdapter(photoAdapter);
     }
 
     private float getSpanWidth() {
-        Resources resources = getResources();
-        DisplayMetrics metrics = resources.getDisplayMetrics();
-        return (metrics.widthPixels / 3);
+        final Resources resources = getResources();
+        final DisplayMetrics metrics = resources.getDisplayMetrics();
+        return (metrics.widthPixels / NUM_COLUMNS);
     }
 
     @Override
@@ -85,7 +86,7 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
 
     @Override
     public void inject() {
-        getAppComponent().getPhotoHomeComponent(new PhotoHomeModule()).inject(this);
+        getAppComponent().getPhotoHomeComponent(new PhotoHomeModule(getSpanWidth())).inject(this);
     }
 
     @Override
@@ -98,26 +99,27 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
         final Intent takeAPictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takeAPictureIntent.resolveActivity(getPackageManager()) != null) {
             final File picture = createImageFile();
-            if (picture != null) {
-                pictureAbsolutePath = picture.getAbsolutePath();
-                takeAPictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(this, APPLICATION_GHIBLIMOVIE_FILEPROVIDER, picture));
-                startActivityForResult(takeAPictureIntent, REQUEST_IMAGE_CAPTURE);
-            }
+            pictureAbsolutePath = picture.getAbsolutePath();
+            takeAPictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                    FileProvider.getUriForFile(this, APPLICATION_GHIBLIMOVIE_FILEPROVIDER, picture));
+            startActivityForResult(takeAPictureIntent, REQUEST_IMAGE_CAPTURE);
         }
     }
 
     @Override
     public void showErrorMessage() {
-        Toast.makeText(this, getString(R.string.photohome_activity_error_impossible_to_take_pictures), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,
+                getString(R.string.photohome_activity_error_impossible_to_take_pictures),
+                Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void updatePhotoList(final Photo photo) {
+    public void updatePhotoList(final Bitmap photo) {
         photoAdapter.addPhoto(photo);
     }
 
     @Override
-    public void updatePhotoList(final List<Photo> photos) {
+    public void updatePhotoList(final List<Bitmap> photos) {
         photoAdapter.addPhotos(photos);
     }
 

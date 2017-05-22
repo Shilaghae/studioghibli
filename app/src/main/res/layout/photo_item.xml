@@ -4,11 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="#cc2f7d">
+    android:background="#e4dce0">
 
     <ImageView
+        android:layout_margin="2dp"
         android:id="@+id/photo_item_imageView_photo"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
 </FrameLayout>

@@ -13,9 +13,15 @@ import io.reactivex.schedulers.Schedulers;
 @Module
 public class PhotoHomeModule {
 
+    private final float photoWidthSize;
+
+    PhotoHomeModule(final float photoWidthSize) {
+        this.photoWidthSize = photoWidthSize;
+    }
+
     @Provides
     @PhotoHomeScope
-    public PhotoHomePresenterImpl providePhotoHomePresenterImpl(final PhotoRepository photoRepository) {
-        return new PhotoHomePresenterImpl(Schedulers.computation(), AndroidSchedulers.mainThread(), photoRepository);
+    PhotoHomePresenterImpl providePhotoHomePresenterImpl(final PhotoRepository photoRepository) {
+        return new PhotoHomePresenterImpl(Schedulers.computation(), AndroidSchedulers.mainThread(), photoRepository, photoWidthSize);
     }
 }
