@@ -42,7 +42,7 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
         super.onAttach(view);
 
         subscribe(photoRepository.getAllPhotos()
-                .subscribeOn(androidMainScheduler)
+                .observeOn(androidMainScheduler)
                 .map(photos -> {
                     final List<String> photoPaths = new ArrayList<>();
                     for (Photo photo : photos) {
@@ -51,7 +51,7 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
                     System.out.println("What thread am I in 1? " + Thread.currentThread().getName());
                     return photoPaths;
                 })
-                .subscribeOn(ioScheduler)
+                .observeOn(ioScheduler)
                 .flatMap(photoPaths -> Observable.create((ObservableOnSubscribe<List<Bitmap>>) e -> {
                     System.out.println("What thread am I in 2? " + Thread.currentThread().getName());
                     List<Bitmap> photoBitmaps = new ArrayList<>();
@@ -61,29 +61,29 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
                     e.onNext(photoBitmaps);
                     e.onComplete();
                 }))
-                .subscribeOn(androidMainScheduler)
                 .observeOn(androidMainScheduler)
+                .subscribeOn(androidMainScheduler)
                 .subscribe(bitmaps -> {
                     view.updatePhotoList(bitmaps);
                 }));
 
         subscribe(view.onTakeAPicture()
-                .subscribeOn(androidMainScheduler)
+                .observeOn(androidMainScheduler)
                 .doOnError(e -> view.showErrorMessage())
                 .subscribe(ignored -> {
                     view.takeAPicture();
                 }));
 
         subscribe(view.onAddPhoto()
-                .subscribeOn(androidMainScheduler)
+                .observeOn(androidMainScheduler)
                 .doOnNext(photoPath -> photoRepository.addPhoto(new Photo(photoPath)))
-                .subscribeOn(ioScheduler)
+                .observeOn(ioScheduler)
                 .map(photoPath -> {
                     System.out.println("What thread am I in 3? " + Thread.currentThread().getName());
                     return getThumbnailBitmap(photoPath);
                 })
-                .subscribeOn(androidMainScheduler)
                 .observeOn(androidMainScheduler)
+                .subscribeOn(androidMainScheduler)
                 .subscribe(photoBitmap -> view.updatePhotoList(photoBitmap)));
     }
 
