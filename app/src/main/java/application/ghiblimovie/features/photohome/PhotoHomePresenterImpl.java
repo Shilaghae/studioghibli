@@ -42,7 +42,6 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
         super.onAttach(view);
 
         subscribe(photoRepository.getAllPhotos()
-                .observeOn(androidMainScheduler)
                 .map(photos -> {
                     final List<String> photoPaths = new ArrayList<>();
                     for (Photo photo : photos) {
@@ -75,7 +74,6 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
                 }));
 
         subscribe(view.onAddPhoto()
-                .observeOn(androidMainScheduler)
                 .doOnNext(photoPath -> photoRepository.addPhoto(new Photo(photoPath)))
                 .observeOn(ioScheduler)
                 .map(photoPath -> {
