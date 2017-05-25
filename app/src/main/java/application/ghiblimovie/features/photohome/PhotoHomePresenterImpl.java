@@ -31,7 +31,6 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
     private final PhotoRepository photoRepository;
     private final float photoWidthSize;
     private ExecutorService executor = Executors.newFixedThreadPool(5, new RxThreadFactory("New Thread"));
-    private CountDownLatch wait = new CountDownLatch(1);
 
 
     public PhotoHomePresenterImpl(final Scheduler ioScheduler,
@@ -61,9 +60,10 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
                 .observeOn(ioScheduler)
                 .flatMap(photoPaths -> {
                     System.out.println("What thread am I in 2? " + Thread.currentThread().getName());
+                    final CountDownLatch wait = new CountDownLatch(1);
                     final List<Bitmap> photoBitmaps = new ArrayList<>();
                     Observable.fromIterable(photoPaths)
-                            .observeOn(Schedulers.from(executor))
+                            .subscribeOn(Schedulers.from(executor))
                             .subscribe(photoPath -> {
                                 System.out.println("What thread am I in 5? " + Thread.currentThread().getName
                                         ());
