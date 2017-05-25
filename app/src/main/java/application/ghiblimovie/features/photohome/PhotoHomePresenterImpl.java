@@ -42,6 +42,7 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
         super.onAttach(view);
 
         subscribe(photoRepository.getAllPhotos()
+                .subscribeOn(androidMainScheduler)
                 .map(photos -> {
                     final List<String> photoPaths = new ArrayList<>();
                     for (Photo photo : photos) {
@@ -61,7 +62,6 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
                     e.onComplete();
                 }))
                 .observeOn(androidMainScheduler)
-                .subscribeOn(androidMainScheduler)
                 .subscribe(bitmaps -> {
                     view.updatePhotoList(bitmaps);
                 }));
@@ -74,6 +74,7 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
                 }));
 
         subscribe(view.onAddPhoto()
+                .subscribeOn(androidMainScheduler)
                 .doOnNext(photoPath -> photoRepository.addPhoto(new Photo(photoPath)))
                 .observeOn(ioScheduler)
                 .map(photoPath -> {
@@ -81,7 +82,6 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
                     return getThumbnailBitmap(photoPath);
                 })
                 .observeOn(androidMainScheduler)
-                .subscribeOn(androidMainScheduler)
                 .subscribe(photoBitmap -> view.updatePhotoList(photoBitmap)));
     }
 
