@@ -7,13 +7,17 @@ import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import application.ghiblimovie.base.BasePresenter;
 import application.ghiblimovie.photorepository.Photo;
 import application.ghiblimovie.photorepository.PhotoRepository;
 import io.reactivex.Observable;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Scheduler;
+import io.reactivex.internal.schedulers.RxThreadFactory;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * @author anna
@@ -26,6 +30,9 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
     private final Scheduler androidMainScheduler;
     private final PhotoRepository photoRepository;
     private final float photoWidthSize;
+    private ExecutorService executor = Executors.newFixedThreadPool(5, new RxThreadFactory("New Thread"));
+    private CountDownLatch wait = new CountDownLatch(1);
+
 
     public PhotoHomePresenterImpl(final Scheduler ioScheduler,
             final Scheduler mainScheduler,
@@ -52,15 +59,19 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
                     return photoPaths;
                 })
                 .observeOn(ioScheduler)
-                .flatMap(photoPaths -> Observable.create((ObservableOnSubscribe<List<Bitmap>>) e -> {
+                .flatMap(photoPaths -> {
                     System.out.println("What thread am I in 2? " + Thread.currentThread().getName());
-                    List<Bitmap> photoBitmaps = new ArrayList<>();
-                    for (String photoPath : photoPaths) {
-                        photoBitmaps.add(getThumbnailBitmap(photoPath));
-                    }
-                    e.onNext(photoBitmaps);
-                    e.onComplete();
-                }))
+                    final List<Bitmap> photoBitmaps = new ArrayList<>();
+                    Observable.fromIterable(photoPaths)
+                            .observeOn(Schedulers.from(executor))
+                            .subscribe(photoPath -> {
+                                System.out.println("What thread am I in 5? " + Thread.currentThread().getName
+                                        ());
+                                photoBitmaps.add(getThumbnailBitmap(photoPath));
+                            }, e -> {}, () -> wait.countDown());
+                    wait.await();
+                    return Observable.just(photoBitmaps);
+                })
                 .observeOn(androidMainScheduler)
                 .subscribe(bitmaps -> {
                     view.updatePhotoList(bitmaps);
