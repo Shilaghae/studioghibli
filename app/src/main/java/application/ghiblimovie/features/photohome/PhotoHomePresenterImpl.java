@@ -31,6 +31,8 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
     private final PhotoRepository photoRepository;
     private final float photoWidthSize;
     private ExecutorService executor = Executors.newFixedThreadPool(5, new RxThreadFactory("New Thread"));
+    final List<PhotoItem> photoItems = new ArrayList<>();
+
 
 
     public PhotoHomePresenterImpl(final Scheduler ioScheduler,
@@ -61,16 +63,17 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
                 .flatMap(photoPaths -> {
                     System.out.println("What thread am I in 2? " + Thread.currentThread().getName());
                     final CountDownLatch wait = new CountDownLatch(1);
-                    final List<Bitmap> photoBitmaps = new ArrayList<>();
                     Observable.fromIterable(photoPaths)
                             .subscribeOn(Schedulers.from(executor))
                             .subscribe(photoPath -> {
                                 System.out.println("What thread am I in 5? " + Thread.currentThread().getName
                                         ());
-                                photoBitmaps.add(getThumbnailBitmap(photoPath));
+                                final Bitmap thumbnailBitmap = getThumbnailBitmap(photoPath);
+
+                                photoItems.add(new PhotoItem(photoPath, thumbnailBitmap));
                             }, e -> {}, () -> wait.countDown());
                     wait.await();
-                    return Observable.just(photoBitmaps);
+                    return Observable.just(photoItems);
                 })
                 .observeOn(androidMainScheduler)
                 .subscribe(bitmaps -> {
@@ -90,10 +93,13 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
                 .observeOn(ioScheduler)
                 .map(photoPath -> {
                     System.out.println("What thread am I in 3? " + Thread.currentThread().getName());
-                    return getThumbnailBitmap(photoPath);
+                    final Bitmap thumbnailBitmap = getThumbnailBitmap(photoPath);
+                    return new PhotoItem(photoPath, thumbnailBitmap);
                 })
                 .observeOn(androidMainScheduler)
                 .subscribe(photoBitmap -> view.updatePhotoList(photoBitmap)));
+
+        subscribe(view.onClickPhotoItem().subscribe(photoItem -> view.showAddDetails()));
     }
 
     private Bitmap getThumbnailBitmap(final String photoPath) {

@@ -1,7 +1,6 @@
 package application.ghiblimovie.features.photohome;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +13,8 @@ import java.util.List;
 import application.ghiblimovie.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 
 /**
  * @author anna
@@ -21,7 +22,8 @@ import butterknife.ButterKnife;
 
 public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder> {
 
-    private final List<Bitmap> mPhotos = new ArrayList<>();
+    private final List<PhotoItem> mPhotos = new ArrayList<>();
+    private PublishSubject<PhotoItem> onClickPhotoUtemPublishSubject = PublishSubject.create();
 
     @Override
     public PhotoHolder onCreateViewHolder(final ViewGroup parent, final int viewType) {
@@ -32,8 +34,8 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
 
     @Override
     public void onBindViewHolder(final PhotoHolder holder, final int position) {
-        final Bitmap bitmap = mPhotos.get(position);
-        holder.setPhotoImage(bitmap);
+        final PhotoItem photoItem = mPhotos.get(position);
+        holder.setPhotoItem(photoItem);
     }
 
     @Override
@@ -41,12 +43,12 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
         return mPhotos.size();
     }
 
-    public void addPhoto(final Bitmap photo) {
+    public void addPhoto(final PhotoItem photo) {
         mPhotos.add(photo);
         notifyItemChanged(mPhotos.size() - 1);
     }
 
-    public void addPhotos(final List<Bitmap> photos) {
+    public void addPhotos(final List<PhotoItem> photos) {
         mPhotos.addAll(photos);
         notifyDataSetChanged();
     }
@@ -56,13 +58,18 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
         @BindView(R.id.photo_item_imageView_photo)
         ImageView mPhotoImageView;
 
-        public PhotoHolder(final View itemView) {
+        PhotoHolder(final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
-        public void setPhotoImage(Bitmap photoBitmat) {
-            mPhotoImageView.setImageBitmap(photoBitmat);
+        void setPhotoItem(PhotoItem photoItem) {
+            mPhotoImageView.setImageBitmap(photoItem.getBitmap());
+            itemView.setOnClickListener(v -> onClickPhotoUtemPublishSubject.onNext(photoItem));
         }
+    }
+
+    public Observable<PhotoItem> onClickItem() {
+        return onClickPhotoUtemPublishSubject;
     }
 }

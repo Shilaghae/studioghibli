@@ -1,7 +1,5 @@
 package application.ghiblimovie.features.photohome;
 
-import android.graphics.Bitmap;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -20,13 +18,17 @@ class PhotoHomeContract {
 
         Observable<String> onAddPhoto();
 
+        Observable<PhotoItem> onClickPhotoItem();
+
         void takeAPicture() throws IOException;
 
         void showErrorMessage();
 
-        void updatePhotoList(Bitmap photo);
+        void updatePhotoList(PhotoItem photo);
 
-        void updatePhotoList(List<Bitmap> photos);
+        void updatePhotoList(List<PhotoItem> photos);
+
+        void showAddDetails();
     }
 
     interface PhotoPresenter {

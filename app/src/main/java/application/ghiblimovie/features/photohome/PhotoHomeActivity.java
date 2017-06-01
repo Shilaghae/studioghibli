@@ -4,7 +4,6 @@ import com.jakewharton.rxbinding2.view.RxView;
 
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
@@ -114,13 +113,18 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
     }
 
     @Override
-    public void updatePhotoList(final Bitmap photo) {
+    public void updatePhotoList(final PhotoItem photo) {
         photoAdapter.addPhoto(photo);
     }
 
     @Override
-    public void updatePhotoList(final List<Bitmap> photos) {
+    public void updatePhotoList(final List<PhotoItem> photos) {
         photoAdapter.addPhotos(photos);
+    }
+
+    @Override
+    public void showAddDetails() {
+
     }
 
     @Override
@@ -134,6 +138,10 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
     @Override
     public Observable<String> onAddPhoto() {
         return onAddPicurePublishSubject;
+    }
+
+    @Override public Observable<PhotoItem> onClickPhotoItem() {
+        return photoAdapter.onClickItem();
     }
 
     private File createImageFile() throws IOException {
