@@ -15,6 +15,16 @@ public class PhotoDetailsContractor {
 
         Observable<String> onGetLocation();
 
+        Observable<Boolean> onFineLocationPermissionRequest();
+
         void getLocation();
+
+        void requireGetLocationPermission();
+
+        void showPermissionDeniedMessage();
+
+        void showLocation(String location);
+
+        void restart();
     }
 }

@@ -4,6 +4,7 @@ import com.jakewharton.rxbinding2.view.RxView;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
@@ -23,15 +24,12 @@ import javax.inject.Inject;
 
 import application.ghiblimovie.R;
 import application.ghiblimovie.base.BaseActivity;
+import application.ghiblimovie.features.photodetails.PhotoDetailsActivity;
 import butterknife.BindView;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 
 import static android.os.Environment.DIRECTORY_PICTURES;
-
-/**
- * @author anna
- */
 
 public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeView>
         implements PhotoHomeContract.PhotoHomeView {
@@ -39,6 +37,7 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     public static final String APPLICATION_GHIBLIMOVIE_FILEPROVIDER = "application.ghiblimovie.fileprovider";
     public static final int NUM_COLUMNS = 3;
+    public static final String PHOTO_PATH = "PHOTO_PATH";
 
     @Inject
     PhotoHomePresenterImpl presenter;
@@ -124,7 +123,7 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
 
     @Override
     public void showAddDetails() {
-
+        PhotoDetailsActivity.startActivity(this);
     }
 
     @Override
@@ -147,5 +146,15 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
     private File createImageFile() throws IOException {
         String pictureFileName = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.UK).format(new Date()) + "_";
         return File.createTempFile(pictureFileName, ".jpg", getExternalFilesDir(DIRECTORY_PICTURES));
+    }
+
+    @Override protected void onSaveInstanceState(final Bundle bundle) {
+        bundle.putString(PHOTO_PATH, pictureAbsolutePath);
+        super.onSaveInstanceState(bundle);
+    }
+
+    @Override protected void onRestoreInstanceState(final Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        pictureAbsolutePath = savedInstanceState.getString(PHOTO_PATH, "");
     }
 }

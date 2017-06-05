@@ -16,6 +16,24 @@ class PhotoDetailsPresenterImpl extends BasePresenter<PhotoDetailsView> {
 
         subscribe(view
                 .onClickAddDetails()
-                .subscribe());
+                .subscribe(o -> {
+                    view.requireGetLocationPermission();
+                }));
+
+        subscribe(view
+                .onFineLocationPermissionRequest()
+                .subscribe(accepted -> {
+                    if (accepted) {
+                        view.getLocation();
+                    } else {
+                        view.showPermissionDeniedMessage();
+                    }
+                }));
+
+        subscribe(view.onGetLocation()
+                .subscribe(location -> {
+                    view.restart();
+                    view.showLocation(location);
+                }));
     }
 }

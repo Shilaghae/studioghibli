@@ -8,4 +8,8 @@
     <string name="movie_details_activity_producer">Producer:</string>
     <string name="movie_details_activity_release_date">Release date:</string>
     <string name="movie_details_activity_score">Score:</string>
+    <string name="no_permission_to_get_location">You have not given permission to get the location, it won\'t be possible to locate the object you have taken picture of</string>
+    <string name="title_location_permission">Can we access your location?</string>
+    <string name="text_location_permission">In order to keep using the app you will be asked whether we can have access to your location.</string>
+    <string name="ok">Ok</string>
 </resources>
