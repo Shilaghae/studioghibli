@@ -28,7 +28,7 @@ class PhotoHomeContract {
 
         void updatePhotoList(List<PhotoItem> photos);
 
-        void showAddDetails();
+        void showAddDetails(PhotoItem photoItem);
     }
 
     interface PhotoPresenter {

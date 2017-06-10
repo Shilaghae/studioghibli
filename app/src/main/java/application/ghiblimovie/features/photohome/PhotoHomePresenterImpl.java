@@ -99,7 +99,7 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
                 .observeOn(androidMainScheduler)
                 .subscribe(photoBitmap -> view.updatePhotoList(photoBitmap)));
 
-        subscribe(view.onClickPhotoItem().subscribe(photoItem -> view.showAddDetails()));
+        subscribe(view.onClickPhotoItem().subscribe(photoItem -> view.showAddDetails(photoItem)));
     }
 
     private Bitmap getThumbnailBitmap(final String photoPath) {

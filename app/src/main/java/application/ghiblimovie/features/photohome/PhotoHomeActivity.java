@@ -122,8 +122,8 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
     }
 
     @Override
-    public void showAddDetails() {
-        PhotoDetailsActivity.startActivity(this);
+    public void showAddDetails(final PhotoItem photoItem) {
+        PhotoDetailsActivity.startActivity(this, photoItem);
     }
 
     @Override

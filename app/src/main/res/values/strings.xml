@@ -12,4 +12,6 @@
     <string name="title_location_permission">Can we access your location?</string>
     <string name="text_location_permission">In order to keep using the app you will be asked whether we can have access to your location.</string>
     <string name="ok">Ok</string>
+    <string name="title_activity_scrolling">ScrollingActivity</string>
+    <string name="action_settings">Settings</string>
 </resources>

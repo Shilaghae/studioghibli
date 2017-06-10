@@ -1,12 +1,10 @@
 package application.ghiblimovie.features.photohome;
 
 import android.graphics.Bitmap;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-/**
- * @author anna
- */
-
-public class PhotoItem {
+public class PhotoItem implements Parcelable {
 
     private final String path;
     private Bitmap bitmap;
@@ -15,6 +13,23 @@ public class PhotoItem {
         this.path = photo;
         this.bitmap = bitmap;
     }
+
+    protected PhotoItem(Parcel in) {
+        path = in.readString();
+        bitmap = in.readParcelable(Bitmap.class.getClassLoader());
+    }
+
+    public static final Creator<PhotoItem> CREATOR = new Creator<PhotoItem>() {
+        @Override
+        public PhotoItem createFromParcel(Parcel in) {
+            return new PhotoItem(in);
+        }
+
+        @Override
+        public PhotoItem[] newArray(int size) {
+            return new PhotoItem[size];
+        }
+    };
 
     @Override
     public boolean equals(final Object obj) {
@@ -31,5 +46,14 @@ public class PhotoItem {
 
     public Bitmap getBitmap() {
         return bitmap;
+    }
+
+    @Override public int describeContents() {
+        return 0;
+    }
+
+    @Override public void writeToParcel(final Parcel dest, final int flags) {
+        dest.writeString(path);
+        dest.writeParcelable(bitmap, flags);
     }
 }

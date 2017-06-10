@@ -14,12 +14,18 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.Toolbar;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -29,23 +35,26 @@ import application.ghiblimovie.R;
 import application.ghiblimovie.base.BaseActivity;
 import application.ghiblimovie.base.BasePresenter;
 import application.ghiblimovie.features.photodetails.PhotoDetailsContractor.PhotoDetailsView;
+import application.ghiblimovie.features.photohome.PhotoItem;
 import butterknife.BindView;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
-
-/**
- * @author anna
- */
 
 public class PhotoDetailsActivity extends BaseActivity<PhotoDetailsView> implements PhotoDetailsView,
         ConnectionCallbacks, OnConnectionFailedListener {
 
     public static final int ACCESS_FINE_LOCATION_CODE_REQUEST = 1;
+    public static final String PHOTO_ITEM = "PHOTO_ITEM";
     @Inject
     PhotoDetailsPresenterImpl presenter;
 
     @BindView(R.id.photodetails_activity_button_getlocation)
     Button getLocationButton;
+
+    @BindView(R.id.photodetails_activity_toolbar_layout) CollapsingToolbarLayout collapsingToolbarLayout;
+    @BindView(R.id.photodetails_activity_background_image) SquareImageView squareImageView;
+
+    private PhotoItem photoItem;
 
     private PublishSubject<String> onGetLocation = PublishSubject.create();
 
@@ -71,6 +80,23 @@ public class PhotoDetailsActivity extends BaseActivity<PhotoDetailsView> impleme
 
     @Override public void init() {
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.photodetails_activity_toolbar);
+        setSupportActionBar(toolbar);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show());
+        // Create an instance of GoogleAPIClient.
+        squareImageView.setImageBitmap(bitmap);
+
+        collapsingToolbarLayout.setTitle("Title");
+        collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
+        if (googleApiClient == null) {
+            googleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
     }
 
     @Override public Observable<Object> onClickAddDetails() {
@@ -140,16 +166,12 @@ public class PhotoDetailsActivity extends BaseActivity<PhotoDetailsView> impleme
 
     }
 
+    private Bitmap bitmap;
+
     @Override protected void onCreate(final Bundle savedInstanceState) {
+        final String path = getIntent().getStringExtra(PHOTO_ITEM);
+        bitmap = BitmapFactory.decodeFile(path);
         super.onCreate(savedInstanceState);
-        // Create an instance of GoogleAPIClient.
-        if (googleApiClient == null) {
-            googleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
     }
 
     @Override
@@ -176,7 +198,9 @@ public class PhotoDetailsActivity extends BaseActivity<PhotoDetailsView> impleme
 
     }
 
-    public static void startActivity(final Context context) {
-        context.startActivity(new Intent(context, PhotoDetailsActivity.class));
+    public static void startActivity(final Context context, final PhotoItem photoItem) {
+        final Intent intent = new Intent(context, PhotoDetailsActivity.class);
+        intent.putExtra(PHOTO_ITEM, photoItem.getPath());
+        context.startActivity(intent);
     }
 }
