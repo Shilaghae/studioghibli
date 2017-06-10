@@ -48,10 +48,6 @@
                 android:resource="@xml/pictures" />
         </provider>
 
-        <activity
-            android:name=".features.photohome.ScrollingActivity"
-            android:label="@string/title_activity_scrolling"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

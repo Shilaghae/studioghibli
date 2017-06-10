@@ -34,19 +34,18 @@ import static android.os.Environment.DIRECTORY_PICTURES;
 public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeView>
         implements PhotoHomeContract.PhotoHomeView {
 
-    private static final int REQUEST_IMAGE_CAPTURE = 1;
-    public static final String APPLICATION_GHIBLIMOVIE_FILEPROVIDER = "application.ghiblimovie.fileprovider";
-    public static final int NUM_COLUMNS = 3;
-    public static final String PHOTO_PATH = "PHOTO_PATH";
-
     @Inject
     PhotoHomePresenterImpl presenter;
 
     @BindView(R.id.photohome_activity_recyclerview_photos)
     RecyclerView photoListRecyclerView;
-
     @BindView(R.id.photohome_activity_button_take_picture)
     FloatingActionButton takePictureFloatingButton;
+
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final String APPLICATION_GHIBLIMOVIE_FILEPROVIDER = "application.ghiblimovie.fileprovider";
+    private static final int NUM_COLUMNS = 3;
+    private static final String PHOTO_PATH = "PHOTO_PATH";
 
     private PublishSubject<String> onAddPicurePublishSubject = PublishSubject.create();
 

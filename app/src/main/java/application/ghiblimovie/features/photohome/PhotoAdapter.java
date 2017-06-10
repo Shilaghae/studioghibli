@@ -16,10 +16,6 @@ import butterknife.ButterKnife;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 
-/**
- * @author anna
- */
-
 public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder> {
 
     private final List<PhotoItem> mPhotos = new ArrayList<>();

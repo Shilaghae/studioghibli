@@ -43,18 +43,16 @@ import io.reactivex.subjects.PublishSubject;
 public class PhotoDetailsActivity extends BaseActivity<PhotoDetailsView> implements PhotoDetailsView,
         ConnectionCallbacks, OnConnectionFailedListener {
 
-    public static final int ACCESS_FINE_LOCATION_CODE_REQUEST = 1;
-    public static final String PHOTO_ITEM = "PHOTO_ITEM";
     @Inject
     PhotoDetailsPresenterImpl presenter;
 
     @BindView(R.id.photodetails_activity_button_getlocation)
     Button getLocationButton;
-
     @BindView(R.id.photodetails_activity_toolbar_layout) CollapsingToolbarLayout collapsingToolbarLayout;
     @BindView(R.id.photodetails_activity_background_image) SquareImageView squareImageView;
 
-    private PhotoItem photoItem;
+    private static final int ACCESS_FINE_LOCATION_CODE_REQUEST = 1;
+    private static final String PHOTO_ITEM = "PHOTO_ITEM";
 
     private PublishSubject<String> onGetLocation = PublishSubject.create();
 
@@ -85,7 +83,6 @@ public class PhotoDetailsActivity extends BaseActivity<PhotoDetailsView> impleme
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show());
-        // Create an instance of GoogleAPIClient.
         squareImageView.setImageBitmap(bitmap);
 
         collapsingToolbarLayout.setTitle("Title");
@@ -195,7 +192,6 @@ public class PhotoDetailsActivity extends BaseActivity<PhotoDetailsView> impleme
     }
 
     @Override public void onConnectionFailed(@NonNull final ConnectionResult connectionResult) {
-
     }
 
     public static void startActivity(final Context context, final PhotoItem photoItem) {

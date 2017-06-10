@@ -71,14 +71,12 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
                                 final Bitmap thumbnailBitmap = getThumbnailBitmap(photoPath);
 
                                 photoItems.add(new PhotoItem(photoPath, thumbnailBitmap));
-                            }, e -> {}, () -> wait.countDown());
+                            }, e -> {}, wait::countDown);
                     wait.await();
                     return Observable.just(photoItems);
                 })
                 .observeOn(androidMainScheduler)
-                .subscribe(bitmaps -> {
-                    view.updatePhotoList(bitmaps);
-                }));
+                .subscribe(view::updatePhotoList));
 
         subscribe(view.onTakeAPicture()
                 .observeOn(androidMainScheduler)
@@ -97,9 +95,9 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
                     return new PhotoItem(photoPath, thumbnailBitmap);
                 })
                 .observeOn(androidMainScheduler)
-                .subscribe(photoBitmap -> view.updatePhotoList(photoBitmap)));
+                .subscribe(view::updatePhotoList));
 
-        subscribe(view.onClickPhotoItem().subscribe(photoItem -> view.showAddDetails(photoItem)));
+        subscribe(view.onClickPhotoItem().subscribe(view::showAddDetails));
     }
 
     private Bitmap getThumbnailBitmap(final String photoPath) {
