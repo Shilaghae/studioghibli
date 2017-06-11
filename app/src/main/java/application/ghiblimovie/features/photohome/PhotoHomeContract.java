@@ -20,6 +20,10 @@ class PhotoHomeContract {
 
         Observable<PhotoItem> onClickPhotoItem();
 
+        Observable<Boolean> onFineLocationPermissionRequest();
+
+        Observable<String> onGetLocation();
+
         void takeAPicture() throws IOException;
 
         void showErrorMessage();
@@ -29,6 +33,12 @@ class PhotoHomeContract {
         void updatePhotoList(List<PhotoItem> photos);
 
         void showAddDetails(PhotoItem photoItem);
+
+        void getLocation();
+
+        void showPermissionDeniedMessage();
+
+        void showLocation(String location);
     }
 
     interface PhotoPresenter {

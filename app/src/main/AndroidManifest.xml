@@ -7,9 +7,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="true" />
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
 
     <application
         android:name=".base.AppApplication"
@@ -21,11 +19,9 @@
         <activity android:name=".features.photohome.PhotoHomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".features.moviedetails.MovieDetailsActivity" />
         <activity android:name=".features.photodetails.PhotoDetailsActivity"
             android:label="@string/title_activity_scrolling"
             android:theme="@style/AppTheme.NoActionBar">
@@ -33,7 +29,6 @@
 
         <receiver android:name=".base.NetworkStatusChangeReceiver">
             <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
             </intent-filter>
         </receiver>

@@ -31,11 +31,10 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
     private final PhotoRepository photoRepository;
     private final float photoWidthSize;
     private ExecutorService executor = Executors.newFixedThreadPool(5, new RxThreadFactory("New Thread"));
-    final List<PhotoItem> photoItems = new ArrayList<>();
+    private final List<PhotoItem> photoItems = new ArrayList<>();
+    private PhotoItem photoItem;
 
-
-
-    public PhotoHomePresenterImpl(final Scheduler ioScheduler,
+    PhotoHomePresenterImpl(final Scheduler ioScheduler,
             final Scheduler mainScheduler,
             final PhotoRepository photoRepository,
             final float photoWidthSize) {
@@ -71,7 +70,8 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
                                 final Bitmap thumbnailBitmap = getThumbnailBitmap(photoPath);
 
                                 photoItems.add(new PhotoItem(photoPath, thumbnailBitmap));
-                            }, e -> {}, wait::countDown);
+                            }, e -> {
+                            }, wait::countDown);
                     wait.await();
                     return Observable.just(photoItems);
                 })
@@ -92,12 +92,30 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
                 .map(photoPath -> {
                     System.out.println("What thread am I in 3? " + Thread.currentThread().getName());
                     final Bitmap thumbnailBitmap = getThumbnailBitmap(photoPath);
-                    return new PhotoItem(photoPath, thumbnailBitmap);
+                    photoItem = new PhotoItem(photoPath, thumbnailBitmap);
+                    photoItems.add(photoItem);
+                    return photoItem;
                 })
                 .observeOn(androidMainScheduler)
                 .subscribe(view::updatePhotoList));
 
         subscribe(view.onClickPhotoItem().subscribe(view::showAddDetails));
+
+        subscribe(view
+                .onFineLocationPermissionRequest()
+                .subscribe(accepted -> {
+                    if (accepted) {
+                        view.getLocation();
+                    } else {
+                        view.showPermissionDeniedMessage();
+                    }
+                }));
+
+        subscribe(view.onGetLocation()
+                .subscribe(s -> {
+                    photoItem.setLocation(s);
+                    view.showLocation(s);
+                }));
     }
 
     private Bitmap getThumbnailBitmap(final String photoPath) {
@@ -106,9 +124,8 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
         int height = bitmap.getHeight();
         int ratio = (int) (photoWidthSize * 100) / width;
         height = (height * ratio) / 100;
-        final Bitmap thumbnail = ThumbnailUtils.extractThumbnail(bitmap,
+        return ThumbnailUtils.extractThumbnail(bitmap,
                 (int) photoWidthSize,
                 height);
-        return thumbnail;
     }
 }

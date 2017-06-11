@@ -1,12 +1,24 @@
 package application.ghiblimovie.features.photohome;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderApi;
+import com.google.android.gms.location.LocationServices;
+
 import com.jakewharton.rxbinding2.view.RxView;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.location.Location;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -32,11 +44,12 @@ import io.reactivex.subjects.PublishSubject;
 import static android.os.Environment.DIRECTORY_PICTURES;
 
 public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeView>
-        implements PhotoHomeContract.PhotoHomeView {
+        implements PhotoHomeContract.PhotoHomeView,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
     @Inject
     PhotoHomePresenterImpl presenter;
-
     @BindView(R.id.photohome_activity_recyclerview_photos)
     RecyclerView photoListRecyclerView;
     @BindView(R.id.photohome_activity_button_take_picture)
@@ -45,16 +58,25 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final String APPLICATION_GHIBLIMOVIE_FILEPROVIDER = "application.ghiblimovie.fileprovider";
     private static final int NUM_COLUMNS = 3;
+    private static final int ACCESS_FINE_LOCATION_CODE_REQUEST = 1;
     private static final String PHOTO_PATH = "PHOTO_PATH";
 
+    private GoogleApiClient googleApiClient;
     private PublishSubject<String> onAddPicurePublishSubject = PublishSubject.create();
-
+    private PublishSubject<Boolean> onPermissionAccepted = PublishSubject.create();
+    private PublishSubject<String> onGetLocation = PublishSubject.create();
     private PhotoAdapter photoAdapter;
-
     private String pictureAbsolutePath;
 
     @Override
     public void init() {
+        if (googleApiClient == null) {
+            googleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
         photoAdapter = new PhotoAdapter();
         photoListRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(3, 1));
         photoListRecyclerView.setAdapter(photoAdapter);
@@ -130,6 +152,37 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Toast.makeText(this, pictureAbsolutePath, Toast.LENGTH_SHORT).show();
             onAddPicurePublishSubject.onNext(pictureAbsolutePath);
+
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+                    PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                            PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[] { Manifest.permission.ACCESS_FINE_LOCATION },
+                        ACCESS_FINE_LOCATION_CODE_REQUEST);
+            } else {
+                onPermissionAccepted.onNext(true);
+            }
+        }
+    }
+    @Override
+    public Observable<Boolean> onFineLocationPermissionRequest() {
+        return onPermissionAccepted;
+    }
+
+    @SuppressLint("MissingPermission") @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+
+        switch (requestCode) {
+            case ACCESS_FINE_LOCATION_CODE_REQUEST: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    onPermissionAccepted.onNext(true);
+                } else {
+                    onPermissionAccepted.onNext(false);
+                }
+            }
         }
     }
 
@@ -138,7 +191,8 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
         return onAddPicurePublishSubject;
     }
 
-    @Override public Observable<PhotoItem> onClickPhotoItem() {
+    @Override
+    public Observable<PhotoItem> onClickPhotoItem() {
         return photoAdapter.onClickItem();
     }
 
@@ -155,5 +209,44 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
     @Override protected void onRestoreInstanceState(final Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         pictureAbsolutePath = savedInstanceState.getString(PHOTO_PATH, "");
+    }
+
+    @Override public void onConnected(@Nullable final Bundle bundle) {
+        final FusedLocationProviderApi fusedLocationApi = LocationServices.FusedLocationApi;
+        @SuppressLint("MissingPermission") Location lastLocation = fusedLocationApi.getLastLocation(googleApiClient);
+        if (lastLocation != null) {
+            String latitude = String.valueOf(lastLocation.getLatitude());
+            String longitude = String.valueOf(lastLocation.getLongitude());
+            onGetLocation.onNext(latitude + ":" + longitude);
+        }
+    }
+
+    @Override public void onConnectionSuspended(final int i) {
+        Toast.makeText(this, "Connection suspended", Toast.LENGTH_LONG).show();
+    }
+
+    @Override public void onConnectionFailed(@NonNull final ConnectionResult connectionResult) {
+        Toast.makeText(this, "Connection failed", Toast.LENGTH_LONG).show();
+    }
+
+    @Override public void getLocation() {
+        googleApiClient.connect();
+    }
+
+    @Override protected void onStop() {
+        super.onStop();
+        googleApiClient.disconnect();
+    }
+
+    @Override public void showPermissionDeniedMessage() {
+        Toast.makeText(this, R.string.no_permission_to_get_location, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override public Observable<String> onGetLocation() {
+        return onGetLocation;
+    }
+
+    @Override public void showLocation(final String location) {
+        Toast.makeText(this, location, Toast.LENGTH_LONG).show();
     }
 }

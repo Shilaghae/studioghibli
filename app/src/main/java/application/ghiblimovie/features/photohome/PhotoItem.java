@@ -56,4 +56,7 @@ public class PhotoItem implements Parcelable {
         dest.writeString(path);
         dest.writeParcelable(bitmap, flags);
     }
+
+    public void setLocation(final String location) {
+    }
 }
