@@ -35,9 +35,9 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
     private PhotoItem photoItem;
 
     PhotoHomePresenterImpl(final Scheduler ioScheduler,
-            final Scheduler mainScheduler,
-            final PhotoRepository photoRepository,
-            final float photoWidthSize) {
+                           final Scheduler mainScheduler,
+                           final PhotoRepository photoRepository,
+                           final float photoWidthSize) {
         this.ioScheduler = ioScheduler;
         this.androidMainScheduler = mainScheduler;
         this.photoRepository = photoRepository;
@@ -49,7 +49,6 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
         super.onAttach(view);
 
         subscribe(photoRepository.getAllPhotos()
-                .subscribeOn(androidMainScheduler)
                 .map(photos -> {
                     final List<String> photoPaths = new ArrayList<>();
                     for (Photo photo : photos) {
@@ -58,12 +57,11 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
                     System.out.println("What thread am I in 1? " + Thread.currentThread().getName());
                     return photoPaths;
                 })
-                .observeOn(ioScheduler)
                 .flatMap(photoPaths -> {
                     System.out.println("What thread am I in 2? " + Thread.currentThread().getName());
                     final CountDownLatch wait = new CountDownLatch(1);
                     Observable.fromIterable(photoPaths)
-                            .subscribeOn(Schedulers.from(executor))
+                            .subscribeOn(ioScheduler)
                             .subscribe(photoPath -> {
                                 System.out.println("What thread am I in 5? " + Thread.currentThread().getName
                                         ());
@@ -75,18 +73,19 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
                     wait.await();
                     return Observable.just(photoItems);
                 })
-                .observeOn(androidMainScheduler)
-                .subscribe(view::updatePhotoList));
+                .subscribeOn(androidMainScheduler)
+                .subscribe(list -> {
+                    System.out.println("What thread am I in 3? " + Thread.currentThread().getName());
+                    view.updatePhotoList(list);
+                }));
 
         subscribe(view.onTakeAPicture()
-                .observeOn(androidMainScheduler)
                 .doOnError(e -> view.showErrorMessage())
                 .subscribe(ignored -> {
                     view.takeAPicture();
                 }));
 
         subscribe(view.onAddPhoto()
-                .subscribeOn(androidMainScheduler)
                 .doOnNext(photoPath -> photoRepository.addPhoto(new Photo(photoPath)))
                 .observeOn(ioScheduler)
                 .map(photoPath -> {
@@ -96,7 +95,7 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
                     photoItems.add(photoItem);
                     return photoItem;
                 })
-                .observeOn(androidMainScheduler)
+                .subscribeOn(androidMainScheduler)
                 .subscribe(view::updatePhotoList));
 
         subscribe(view.onClickPhotoItem().subscribe(view::showAddDetails));
