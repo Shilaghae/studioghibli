@@ -30,7 +30,6 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
     private final Scheduler androidMainScheduler;
     private final PhotoRepository photoRepository;
     private final float photoWidthSize;
-    private ExecutorService executor = Executors.newFixedThreadPool(5, new RxThreadFactory("New Thread"));
     private final List<PhotoItem> photoItems = new ArrayList<>();
     private PhotoItem photoItem;
 
@@ -50,34 +49,28 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
 
         subscribe(photoRepository.getAllPhotos()
                 .map(photos -> {
-                    final List<String> photoPaths = new ArrayList<>();
-                    for (Photo photo : photos) {
-                        photoPaths.add(photo.getPhotoPath());
-                    }
-                    System.out.println("What thread am I in 1? " + Thread.currentThread().getName());
-                    return photoPaths;
-                })
-                .flatMap(photoPaths -> {
-                    System.out.println("What thread am I in 2? " + Thread.currentThread().getName());
-                    final CountDownLatch wait = new CountDownLatch(1);
-                    Observable.fromIterable(photoPaths)
-                            .subscribeOn(ioScheduler)
-                            .subscribe(photoPath -> {
-                                System.out.println("What thread am I in 5? " + Thread.currentThread().getName
-                                        ());
-                                final Bitmap thumbnailBitmap = getThumbnailBitmap(photoPath);
+                    final List<String> paths = new ArrayList<>();
+                    Observable.fromIterable(photos).subscribe(photo -> paths.add(photo.getPhotoPath()));
+                    return paths;
 
-                                photoItems.add(new PhotoItem(photoPath, thumbnailBitmap));
-                            }, e -> {
-                            }, wait::countDown);
-                    wait.await();
-                    return Observable.just(photoItems);
                 })
-                .subscribeOn(androidMainScheduler)
-                .subscribe(list -> {
-                    System.out.println("What thread am I in 3? " + Thread.currentThread().getName());
-                    view.updatePhotoList(list);
-                }));
+                .doOnNext(photos -> {
+                    System.out.println("What thread am I in 2? " + Thread.currentThread().getName());
+                    Observable.fromIterable(photos)
+                            .flatMap(photoPaths -> {
+                                System.out.println("What thread am I in 5? " + Thread.currentThread().getName());
+                                final Bitmap thumbnailBitmap = getThumbnailBitmap(photoPaths);
+                                return Observable.just(new PhotoItem(photoPaths, thumbnailBitmap));
+                            })
+                            .subscribeOn(ioScheduler)
+                            .observeOn(androidMainScheduler)
+                            .subscribe(s -> {
+                                System.out.println("What thread am I in 6? " + Thread.currentThread().getName());
+                                view.updatePhotoList(s);
+                                photoItems.add(s);
+                            });
+                })
+                .subscribe());
 
         subscribe(view.onTakeAPicture()
                 .doOnError(e -> view.showErrorMessage())
