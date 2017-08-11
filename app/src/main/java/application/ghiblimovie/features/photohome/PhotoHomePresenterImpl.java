@@ -7,17 +7,12 @@ import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import application.ghiblimovie.base.BasePresenter;
 import application.ghiblimovie.photorepository.Photo;
 import application.ghiblimovie.photorepository.PhotoRepository;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
-import io.reactivex.internal.schedulers.RxThreadFactory;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * @author anna
@@ -27,7 +22,7 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
         implements PhotoHomeContract.PhotoPresenter {
 
     private final Scheduler ioScheduler;
-    private final Scheduler androidMainScheduler;
+    private final Scheduler uiScheduler;
     private final PhotoRepository photoRepository;
     private final float photoWidthSize;
     private final List<PhotoItem> photoItems = new ArrayList<>();
@@ -38,7 +33,7 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
                            final PhotoRepository photoRepository,
                            final float photoWidthSize) {
         this.ioScheduler = ioScheduler;
-        this.androidMainScheduler = mainScheduler;
+        this.uiScheduler = mainScheduler;
         this.photoRepository = photoRepository;
         this.photoWidthSize = photoWidthSize;
     }
@@ -57,13 +52,14 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
                 .doOnNext(photos -> {
                     System.out.println("What thread am I in 2? " + Thread.currentThread().getName());
                     Observable.fromIterable(photos)
+                            .observeOn(ioScheduler)
                             .flatMap(photoPaths -> {
                                 System.out.println("What thread am I in 5? " + Thread.currentThread().getName());
                                 final Bitmap thumbnailBitmap = getThumbnailBitmap(photoPaths);
                                 return Observable.just(new PhotoItem(photoPaths, thumbnailBitmap));
                             })
-                            .subscribeOn(ioScheduler)
-                            .observeOn(androidMainScheduler)
+                            .subscribeOn(uiScheduler)
+                            .observeOn(uiScheduler)
                             .subscribe(s -> {
                                 System.out.println("What thread am I in 6? " + Thread.currentThread().getName());
                                 view.updatePhotoList(s);
@@ -88,7 +84,8 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
                     photoItems.add(photoItem);
                     return photoItem;
                 })
-                .subscribeOn(androidMainScheduler)
+                .observeOn(uiScheduler)
+                .subscribeOn(uiScheduler)
                 .subscribe(view::updatePhotoList));
 
         subscribe(view.onClickPhotoItem().subscribe(view::showAddDetails));
