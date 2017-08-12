@@ -25,8 +25,6 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
     private final Scheduler uiScheduler;
     private final PhotoRepository photoRepository;
     private final float photoWidthSize;
-    private final List<PhotoItem> photoItems = new ArrayList<>();
-    private PhotoItem photoItem;
 
     PhotoHomePresenterImpl(final Scheduler ioScheduler,
                            final Scheduler mainScheduler,
@@ -43,30 +41,7 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
         super.onAttach(view);
 
         subscribe(photoRepository.getAllPhotos()
-                .map(photos -> {
-                    final List<String> paths = new ArrayList<>();
-                    Observable.fromIterable(photos).subscribe(photo -> paths.add(photo.getPhotoPath()));
-                    return paths;
-
-                })
-                .doOnNext(photos -> {
-                    System.out.println("What thread am I in 2? " + Thread.currentThread().getName());
-                    Observable.fromIterable(photos)
-                            .observeOn(ioScheduler)
-                            .flatMap(photoPaths -> {
-                                System.out.println("What thread am I in 5? " + Thread.currentThread().getName());
-                                final Bitmap thumbnailBitmap = getThumbnailBitmap(photoPaths);
-                                return Observable.just(new PhotoItem(photoPaths, thumbnailBitmap));
-                            })
-                            .subscribeOn(uiScheduler)
-                            .observeOn(uiScheduler)
-                            .subscribe(s -> {
-                                System.out.println("What thread am I in 6? " + Thread.currentThread().getName());
-                                view.updatePhotoList(s);
-                                photoItems.add(s);
-                            });
-                })
-                .subscribe());
+                .subscribe(photos -> Observable.fromIterable(photos).subscribe(photo ->view.updatePhotoList(photo))));
 
         subscribe(view.onTakeAPicture()
                 .doOnError(e -> view.showErrorMessage())
@@ -75,18 +50,7 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
                 }));
 
         subscribe(view.onAddPhoto()
-                .doOnNext(photoPath -> photoRepository.addPhoto(new Photo(photoPath)))
-                .observeOn(ioScheduler)
-                .map(photoPath -> {
-                    System.out.println("What thread am I in 3? " + Thread.currentThread().getName());
-                    final Bitmap thumbnailBitmap = getThumbnailBitmap(photoPath);
-                    photoItem = new PhotoItem(photoPath, thumbnailBitmap);
-                    photoItems.add(photoItem);
-                    return photoItem;
-                })
-                .observeOn(uiScheduler)
-                .subscribeOn(uiScheduler)
-                .subscribe(view::updatePhotoList));
+                .subscribe(photo -> {Photo p = new Photo(photo); photoRepository.addPhoto(p);view.updatePhotoList(p);}));
 
         subscribe(view.onClickPhotoItem().subscribe(view::showAddDetails));
 
@@ -102,19 +66,7 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
 
         subscribe(view.onGetLocation()
                 .subscribe(s -> {
-                    photoItem.setLocation(s);
                     view.showLocation(s);
                 }));
-    }
-
-    private Bitmap getThumbnailBitmap(final String photoPath) {
-        final Bitmap bitmap = BitmapFactory.decodeFile(photoPath);
-        final int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
-        int ratio = (int) (photoWidthSize * 100) / width;
-        height = (height * ratio) / 100;
-        return ThumbnailUtils.extractThumbnail(bitmap,
-                (int) photoWidthSize,
-                height);
     }
 }

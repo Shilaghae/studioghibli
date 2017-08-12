@@ -37,6 +37,7 @@ import javax.inject.Inject;
 import application.ghiblimovie.R;
 import application.ghiblimovie.base.BaseActivity;
 import application.ghiblimovie.features.photodetails.PhotoDetailsActivity;
+import application.ghiblimovie.photorepository.Photo;
 import butterknife.BindView;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
@@ -77,7 +78,7 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
                     .addApi(LocationServices.API)
                     .build();
         }
-        photoAdapter = new PhotoAdapter();
+        photoAdapter = new PhotoAdapter(this, getSpanWidth());
         photoListRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(3, 1));
         photoListRecyclerView.setAdapter(photoAdapter);
     }
@@ -133,17 +134,17 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
     }
 
     @Override
-    public void updatePhotoList(final PhotoItem photo) {
+    public void updatePhotoList(final Photo photo) {
         photoAdapter.addPhoto(photo);
     }
 
     @Override
-    public void updatePhotoList(final List<PhotoItem> photos) {
+    public void updatePhotoList(final List<Photo> photos) {
         photoAdapter.addPhotos(photos);
     }
 
     @Override
-    public void showAddDetails(final PhotoItem photoItem) {
+    public void showAddDetails(final Photo photoItem) {
         PhotoDetailsActivity.startActivity(this, photoItem);
     }
 
@@ -192,7 +193,7 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
     }
 
     @Override
-    public Observable<PhotoItem> onClickPhotoItem() {
+    public Observable<Photo> onClickPhotoItem() {
         return photoAdapter.onClickItem();
     }
 

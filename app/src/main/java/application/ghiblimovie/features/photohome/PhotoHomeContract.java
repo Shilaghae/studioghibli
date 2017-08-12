@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import application.ghiblimovie.base.BaseView;
+import application.ghiblimovie.photorepository.Photo;
 import io.reactivex.Observable;
 
 /**
@@ -18,7 +19,7 @@ class PhotoHomeContract {
 
         Observable<String> onAddPhoto();
 
-        Observable<PhotoItem> onClickPhotoItem();
+        Observable<Photo> onClickPhotoItem();
 
         Observable<Boolean> onFineLocationPermissionRequest();
 
@@ -28,11 +29,11 @@ class PhotoHomeContract {
 
         void showErrorMessage();
 
-        void updatePhotoList(PhotoItem photo);
+        void updatePhotoList(Photo photo);
 
-        void updatePhotoList(List<PhotoItem> photos);
+        void updatePhotoList(List<Photo> photos);
 
-        void showAddDetails(PhotoItem photoItem);
+        void showAddDetails(Photo photoItem);
 
         void getLocation();
 

@@ -19,7 +19,7 @@ import application.ghiblimovie.R;
 import application.ghiblimovie.base.BaseActivity;
 import application.ghiblimovie.base.BasePresenter;
 import application.ghiblimovie.features.photodetails.PhotoDetailsContractor.PhotoDetailsView;
-import application.ghiblimovie.features.photohome.PhotoItem;
+import application.ghiblimovie.photorepository.Photo;
 import butterknife.BindView;
 import io.reactivex.Observable;
 
@@ -74,9 +74,9 @@ public class PhotoDetailsActivity extends BaseActivity<PhotoDetailsView> impleme
         super.onCreate(savedInstanceState);
     }
 
-    public static void startActivity(final Context context, final PhotoItem photoItem) {
+    public static void startActivity(final Context context, final Photo photoItem) {
         final Intent intent = new Intent(context, PhotoDetailsActivity.class);
-        intent.putExtra(PHOTO_ITEM, photoItem.getPath());
+        intent.putExtra(PHOTO_ITEM, photoItem.getPhotoPath());
         context.startActivity(intent);
     }
 }

@@ -1,16 +1,25 @@
 package application.ghiblimovie.features.photohome;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+import android.media.ThumbnailUtils;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import application.ghiblimovie.R;
+import application.ghiblimovie.photorepository.Photo;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
@@ -18,8 +27,16 @@ import io.reactivex.subjects.PublishSubject;
 
 public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder> {
 
-    private final List<PhotoItem> mPhotos = new ArrayList<>();
-    private PublishSubject<PhotoItem> onClickPhotoUtemPublishSubject = PublishSubject.create();
+    private final List<Photo> mPhotos = new ArrayList<>();
+    private final Context context;
+    private final float width;
+    private PublishSubject<Photo> onClickPhotoUtemPublishSubject = PublishSubject.create();
+
+    public PhotoAdapter(Context context, float width) {
+
+        this.context = context;
+        this.width = width;
+    }
 
     @Override
     public PhotoHolder onCreateViewHolder(final ViewGroup parent, final int viewType) {
@@ -30,7 +47,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
 
     @Override
     public void onBindViewHolder(final PhotoHolder holder, final int position) {
-        final PhotoItem photoItem = mPhotos.get(position);
+        final Photo photoItem = mPhotos.get(position);
         holder.setPhotoItem(photoItem);
     }
 
@@ -39,12 +56,12 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
         return mPhotos.size();
     }
 
-    public void addPhoto(final PhotoItem photo) {
+    public void addPhoto(final Photo photo) {
         mPhotos.add(photo);
         notifyItemChanged(mPhotos.size() - 1);
     }
 
-    public void addPhotos(final List<PhotoItem> photos) {
+    public void addPhotos(final List<Photo> photos) {
         mPhotos.addAll(photos);
         notifyDataSetChanged();
     }
@@ -59,13 +76,41 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
             ButterKnife.bind(this, itemView);
         }
 
-        void setPhotoItem(PhotoItem photoItem) {
-            mPhotoImageView.setImageBitmap(photoItem.getBitmap());
+        void setPhotoItem(Photo photoItem) {
+
+            final Target target = new Target() {
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                    mPhotoImageView.setImageBitmap(getThumbnailBitmap(bitmap));
+                }
+
+                @Override
+                public void onBitmapFailed(Drawable errorDrawable) {
+
+                }
+
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                }
+            };
+            mPhotoImageView.setTag(target);
+            Picasso.with(context).load(new File(photoItem.getPhotoPath())).into(target);
             itemView.setOnClickListener(v -> onClickPhotoUtemPublishSubject.onNext(photoItem));
         }
     }
 
-    public Observable<PhotoItem> onClickItem() {
+    public Observable<Photo> onClickItem() {
         return onClickPhotoUtemPublishSubject;
+    }
+
+    private Bitmap getThumbnailBitmap(final Bitmap bitmap) {
+        final int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        int ratio = (int) (this.width * 100) / width;
+        height = (height * ratio) / 100;
+        return ThumbnailUtils.extractThumbnail(bitmap,
+                (int) this.width,
+                height);
     }
 }
