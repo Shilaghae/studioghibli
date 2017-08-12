@@ -1,5 +1,7 @@
 package application.ghiblimovie.features.photohome;
 
+import android.graphics.Bitmap;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -29,7 +31,7 @@ class PhotoHomeContract {
 
         void showErrorMessage();
 
-        void updatePhotoList(Photo photo);
+        void updatePhotoList(Photo photo, Bitmap bitmap);
 
         void updatePhotoList(List<Photo> photos);
 

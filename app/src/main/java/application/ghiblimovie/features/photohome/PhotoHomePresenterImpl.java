@@ -5,8 +5,8 @@ import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
 import android.support.annotation.NonNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import application.ghiblimovie.base.BasePresenter;
 import application.ghiblimovie.photorepository.Photo;
@@ -23,25 +23,33 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
 
     private final Scheduler ioScheduler;
     private final Scheduler uiScheduler;
-    private final PhotoRepository photoRepository;
-    private final float photoWidthSize;
+    private final PhotoRepository repository;
+    private final float width;
+    private final Map<String, Photo> map = new HashMap<>();
 
     PhotoHomePresenterImpl(final Scheduler ioScheduler,
                            final Scheduler mainScheduler,
-                           final PhotoRepository photoRepository,
-                           final float photoWidthSize) {
+                           final PhotoRepository repository,
+                           final float width) {
         this.ioScheduler = ioScheduler;
         this.uiScheduler = mainScheduler;
-        this.photoRepository = photoRepository;
-        this.photoWidthSize = photoWidthSize;
+        this.repository = repository;
+        this.width = width;
     }
+
 
     @Override
     public void onAttach(@NonNull final PhotoHomeContract.PhotoHomeView view) {
         super.onAttach(view);
 
-        subscribe(photoRepository.getAllPhotos()
-                .subscribe(photos -> Observable.fromIterable(photos).subscribe(photo ->view.updatePhotoList(photo))));
+        subscribe(repository.getAllPhotos()
+                .subscribe(photos -> Observable.fromIterable(photos)
+                        .map(photo -> {map.put(photo.getAbsolutePath(), photo); return photo.getAbsolutePath();})
+                        .observeOn(ioScheduler)
+                        .flatMap(photoAbsolutePath -> Observable.just(new BitmapPhoto(photoAbsolutePath, getThumbnailBitmap(photoAbsolutePath))))
+                        .observeOn(uiScheduler)
+                        .subscribe(photoBitmap -> view.updatePhotoList(map.get(photoBitmap.photoAbsolutePath), photoBitmap.bitmapPhoto))
+                ));
 
         subscribe(view.onTakeAPicture()
                 .doOnError(e -> view.showErrorMessage())
@@ -50,7 +58,14 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
                 }));
 
         subscribe(view.onAddPhoto()
-                .subscribe(photo -> {Photo p = new Photo(photo); photoRepository.addPhoto(p);view.updatePhotoList(p);}));
+                .observeOn(ioScheduler)
+                .flatMap(photoAbsolutePath -> Observable.just(new BitmapPhoto(photoAbsolutePath, getThumbnailBitmap(photoAbsolutePath))))
+                .observeOn(uiScheduler)
+                .subscribe(bitmapPhoto -> {
+                    final Photo photo = new Photo(bitmapPhoto.photoAbsolutePath);
+                    repository.addPhoto(photo);
+                    view.updatePhotoList(photo, bitmapPhoto.bitmapPhoto);
+                }));
 
         subscribe(view.onClickPhotoItem().subscribe(view::showAddDetails));
 
@@ -65,8 +80,27 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
                 }));
 
         subscribe(view.onGetLocation()
-                .subscribe(s -> {
-                    view.showLocation(s);
-                }));
+                .subscribe(view::showLocation));
+    }
+
+    class BitmapPhoto {
+        private String photoAbsolutePath;
+        private final Bitmap bitmapPhoto;
+
+        BitmapPhoto(final String photoAbsolutePath, final Bitmap bitmapPhoto) {
+            this.photoAbsolutePath = photoAbsolutePath;
+            this.bitmapPhoto = bitmapPhoto;
+        }
+    }
+
+    private Bitmap getThumbnailBitmap(final String photoAbsolutePath) {
+        Bitmap bitmap = BitmapFactory.decodeFile(photoAbsolutePath);
+        final int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        int ratio = (int) (this.width * 100) / width;
+        height = (height * ratio) / 100;
+        return ThumbnailUtils.extractThumbnail(bitmap,
+                (int) this.width,
+                height);
     }
 }

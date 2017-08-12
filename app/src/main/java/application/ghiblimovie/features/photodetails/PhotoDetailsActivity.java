@@ -76,7 +76,7 @@ public class PhotoDetailsActivity extends BaseActivity<PhotoDetailsView> impleme
 
     public static void startActivity(final Context context, final Photo photoItem) {
         final Intent intent = new Intent(context, PhotoDetailsActivity.class);
-        intent.putExtra(PHOTO_ITEM, photoItem.getPhotoPath());
+        intent.putExtra(PHOTO_ITEM, photoItem.getAbsolutePath());
         context.startActivity(intent);
     }
 }

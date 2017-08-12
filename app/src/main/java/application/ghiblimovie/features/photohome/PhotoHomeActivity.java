@@ -12,6 +12,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -134,8 +135,8 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
     }
 
     @Override
-    public void updatePhotoList(final Photo photo) {
-        photoAdapter.addPhoto(photo);
+    public void updatePhotoList(final Photo photo, final Bitmap bitmap) {
+        photoAdapter.addPhoto(photo, bitmap);
     }
 
     @Override

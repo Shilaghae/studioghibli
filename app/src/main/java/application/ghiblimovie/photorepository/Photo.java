@@ -26,7 +26,7 @@ public class Photo extends RealmObject implements Parcelable {
         mPath = in.readString();
     }
 
-    public String getPhotoPath() {
+    public String getAbsolutePath() {
         return mPath;
     }
 
