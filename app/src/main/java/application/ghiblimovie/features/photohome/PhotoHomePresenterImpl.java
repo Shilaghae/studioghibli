@@ -44,7 +44,10 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
 
         subscribe(repository.getAllPhotos()
                 .subscribe(photos -> Observable.fromIterable(photos)
-                        .map(photo -> {map.put(photo.getAbsolutePath(), photo); return photo.getAbsolutePath();})
+                        .map(photo -> {
+                            map.put(photo.getAbsolutePath(), photo);
+                            return photo.getAbsolutePath();
+                        })
                         .observeOn(ioScheduler)
                         .flatMap(photoAbsolutePath -> Observable.just(new BitmapPhoto(photoAbsolutePath, getThumbnailBitmap(photoAbsolutePath))))
                         .observeOn(uiScheduler)

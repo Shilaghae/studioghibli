@@ -79,7 +79,7 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
                     .addApi(LocationServices.API)
                     .build();
         }
-        photoAdapter = new PhotoAdapter(this, getSpanWidth());
+        photoAdapter = new PhotoAdapter();
         photoListRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(3, 1));
         photoListRecyclerView.setAdapter(photoAdapter);
     }

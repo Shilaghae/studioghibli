@@ -11,7 +11,7 @@ import io.realm.RealmObject;
 
 public class Photo extends RealmObject implements Parcelable {
 
-    private String mPath;
+    private String photoAbsolutePath;
 
     public Photo() {
         // To remove "Error:A default public constructor with no argument must be declared if a custom constructor is
@@ -19,20 +19,20 @@ public class Photo extends RealmObject implements Parcelable {
     }
 
     public Photo(final String path) {
-        mPath = path;
+        photoAbsolutePath = path;
     }
 
     public Photo(Parcel in) {
-        mPath = in.readString();
+        photoAbsolutePath = in.readString();
     }
 
     public String getAbsolutePath() {
-        return mPath;
+        return photoAbsolutePath;
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(mPath);
+        dest.writeString(photoAbsolutePath);
     }
 
     @Override
