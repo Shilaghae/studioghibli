@@ -64,7 +64,7 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
     private static final String PHOTO_PATH = "PHOTO_PATH";
 
     private GoogleApiClient googleApiClient;
-    private PublishSubject<String> onAddPicurePublishSubject = PublishSubject.create();
+    private PublishSubject<String> onAddPhotoPublishSubject = PublishSubject.create();
     private PublishSubject<Boolean> onPermissionAccepted = PublishSubject.create();
     private PublishSubject<String> onGetLocation = PublishSubject.create();
     private PhotoAdapter photoAdapter;
@@ -153,7 +153,7 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Toast.makeText(this, pictureAbsolutePath, Toast.LENGTH_SHORT).show();
-            onAddPicurePublishSubject.onNext(pictureAbsolutePath);
+            onAddPhotoPublishSubject.onNext(pictureAbsolutePath);
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
                     PackageManager.PERMISSION_GRANTED &&
@@ -190,7 +190,7 @@ public class PhotoHomeActivity extends BaseActivity<PhotoHomeContract.PhotoHomeV
 
     @Override
     public Observable<String> onAddPhoto() {
-        return onAddPicurePublishSubject;
+        return onAddPhotoPublishSubject;
     }
 
     @Override

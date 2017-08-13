@@ -5,7 +5,9 @@ import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import application.ghiblimovie.base.BasePresenter;
@@ -42,17 +44,33 @@ public class PhotoHomePresenterImpl extends BasePresenter<PhotoHomeContract.Phot
     public void onAttach(@NonNull final PhotoHomeContract.PhotoHomeView view) {
         super.onAttach(view);
 
+//        subscribe(repository.getAllPhotos()
+//                .subscribe(photos -> Observable.fromIterable(photos)
+//                        .map(photo -> {
+//                            map.put(photo.getAbsolutePath(), photo);
+//                            return photo.getAbsolutePath();
+//                        })
+//                        .observeOn(ioScheduler)
+//                        .flatMap(photoAbsolutePath -> Observable.just(new BitmapPhoto(photoAbsolutePath, getThumbnailBitmap(photoAbsolutePath))))
+//                        .observeOn(uiScheduler)
+//                        .subscribe(photoBitmap -> view.updatePhotoList(map.get(photoBitmap.photoAbsolutePath), photoBitmap.bitmapPhoto))
+//                ));
+
         subscribe(repository.getAllPhotos()
-                .subscribe(photos -> Observable.fromIterable(photos)
-                        .map(photo -> {
-                            map.put(photo.getAbsolutePath(), photo);
-                            return photo.getAbsolutePath();
-                        })
-                        .observeOn(ioScheduler)
-                        .flatMap(photoAbsolutePath -> Observable.just(new BitmapPhoto(photoAbsolutePath, getThumbnailBitmap(photoAbsolutePath))))
-                        .observeOn(uiScheduler)
-                        .subscribe(photoBitmap -> view.updatePhotoList(map.get(photoBitmap.photoAbsolutePath), photoBitmap.bitmapPhoto))
-                ));
+                .map(photos -> {
+                    List<String> absolutePhotoPaths = new ArrayList<>();
+                    for (Photo photo : photos) {
+                        absolutePhotoPaths.add(photo.getAbsolutePath());
+                        map.put(photo.getAbsolutePath(), photo);
+                    }
+                    return absolutePhotoPaths;
+                })
+                .observeOn(ioScheduler)
+                .doOnNext(paths -> Observable.fromIterable(paths)
+                        .subscribe(photoAbsolutePath -> Observable.just(new BitmapPhoto(photoAbsolutePath, getThumbnailBitmap(photoAbsolutePath)))
+                                .subscribeOn(uiScheduler)
+                                .subscribe(photoBitmap -> view.updatePhotoList(map.get(photoBitmap.photoAbsolutePath), photoBitmap.bitmapPhoto))))
+                .subscribe());
 
         subscribe(view.onTakeAPicture()
                 .doOnError(e -> view.showErrorMessage())
